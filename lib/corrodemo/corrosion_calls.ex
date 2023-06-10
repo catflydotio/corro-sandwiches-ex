@@ -1,7 +1,8 @@
 defmodule Corrodemo.CorroCalls do
 
   # set base_url as a module attribute (available throughout the module)
-  @base_url "http://localhost:8080/db/"
+  # @corro_db_url "http://localhost:8080/db/"
+  @corro_db_url "http://#{System.get_env("CORRO_BASEURL")}:8080/db/"
 
   # Corrosion wants JSON, Finch wants, I think, a list.
   # Example:
@@ -13,7 +14,8 @@ defmodule Corrodemo.CorroCalls do
 
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
-    with {:ok, resp} <- Finch.build(:post,"#{@base_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
+    IO.inspect(@corro_db_url)
+    with {:ok, resp} <- Finch.build(:post,"#{@corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
     |> Finch.request(Corrodemo.Finch) do
       {:ok, %{status_code: resp.status, results: extract_results(resp.body), headers: resp.headers}}
     else

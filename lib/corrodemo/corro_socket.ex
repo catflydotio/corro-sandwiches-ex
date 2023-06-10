@@ -2,14 +2,16 @@ defmodule Corrodemo.CorroSockets do
   use WebSockex
   require Logger
 
-  # @corro_sub_endpoint "ws://echo.websocket.events/?encoding=text"
-  @corro_sub_endpoint "http://localhost:8080/v1/subscribe"
+  # @corro_sub_endpoint "#{System.get_env("CORRO_BASEURL")}v1/subscribe"
+  # @corro_sub_endpoint "http://localhost:8080/v1/subscribe"
 
   def start_link(opts \\ []) do
+    subscribe_endpoint = "http://#{System.get_env("CORRO_BASEURL")}:8080/v1/subscribe"
+    IO.inspect(subscribe_endpoint)
     # This is the function that gets run by the supervisor when I run the server
     # so I guess I have to include add_sub.
-    {:ok, pid} = WebSockex.start_link(@corro_sub_endpoint, __MODULE__, %{}, opts)
-    add_sub(pid)
+   {:ok, pid} = WebSockex.start_link(subscribe_endpoint, __MODULE__, %{}, opts)
+   add_sub(pid)
   end
 
   def add_sub(pid) do

@@ -28,6 +28,9 @@ defmodule CorrodemoWeb.ShowOutputLive do
     <div>
     lax sandwich: <%= @lax %>
     </div>
+    <div>
+    yul sandwich: <%= @yul %>
+    </div>
     """
   end
 
@@ -35,7 +38,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
     temperature = 500
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "fromcorro")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")
-    {:ok, assign(socket, temperature: temperature, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", sandwichmsg: "empty bread", corromsg: "blank", yyz: "blank", ewr: "blank", lax: "blank")}
+    {:ok, assign(socket, temperature: temperature, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", sandwichmsg: "empty bread", corromsg: "blank", yyz: "blank", ewr: "blank", lax: "blank", yul: "blank")}
   end
 
   def handle_event("inc_temperature", _params, socket) do
@@ -65,7 +68,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
 
   def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
     IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
-    {:noreply, assign(socket, String.to_atom(region), sandwich)}
+    {:noreply, assign(socket, String.to_existing_atom(region), sandwich)}
   end
 
 end
