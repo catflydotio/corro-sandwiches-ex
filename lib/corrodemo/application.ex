@@ -13,7 +13,11 @@ defmodule Corrodemo.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Corrodemo.PubSub},
       # Start Finch
-      {Finch, name: Corrodemo.Finch},
+      {Finch, name: Corrodemo.Finch,
+        pools: %{
+            default: [conn_opts: [transport_opts: [inet6: true]]]
+        }},
+
       # Start the Endpoint (http/https)
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
@@ -22,7 +26,9 @@ defmodule Corrodemo.Application do
       ## the supervisor will run start_link
       Corrodemo.CorroSockets,
       Corrodemo.GenSandwich,
-      Corrodemo.SandwichSender
+      Corrodemo.SandwichSender,
+      Corrodemo.CheckCorro
+
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

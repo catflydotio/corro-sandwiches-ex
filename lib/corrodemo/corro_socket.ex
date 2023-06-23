@@ -6,7 +6,7 @@ defmodule Corrodemo.CorroSockets do
   # @corro_sub_endpoint "http://localhost:8080/v1/subscribe"
 
   def start_link(opts \\ []) do
-    subscribe_endpoint = "http://#{System.get_env("CORRO_BASEURL")}:8080/v1/subscribe"
+    subscribe_endpoint = "#{System.get_env("CORRO_BASEURL")}/v1/subscribe"
     IO.inspect(subscribe_endpoint)
     # This is the function that gets run by the supervisor when I run the server
     # so I guess I have to include add_sub.

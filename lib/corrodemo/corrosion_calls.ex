@@ -1,9 +1,5 @@
 defmodule Corrodemo.CorroCalls do
 
-  # set base_url as a module attribute (available throughout the module)
-  # @corro_db_url "http://localhost:8080/db/"
-  @corro_db_url "http://#{System.get_env("CORRO_BASEURL")}:8080/db/"
-
   # Corrosion wants JSON, Finch wants, I think, a list.
   # Example:
   # iex(85)> Corrodemo.CorroCalls.format_statement("SELECT * FROM TESTS")
@@ -14,8 +10,10 @@ defmodule Corrodemo.CorroCalls do
 
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
-    IO.inspect(@corro_db_url)
-    with {:ok, resp} <- Finch.build(:post,"#{@corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
+    corro_db_url = "#{System.get_env("CORRO_BASEURL")}/db/"
+    # IO.inspect("About to inspect corro db url")
+    # IO.inspect(corro_db_url)
+    with {:ok, resp} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
     |> Finch.request(Corrodemo.Finch) do
       {:ok, %{status_code: resp.status, results: extract_results(resp.body), headers: resp.headers}}
     else
@@ -33,7 +31,6 @@ defmodule Corrodemo.CorroCalls do
     # IO.inspect("above: extract_results work so far")
   end
 
-
   def get_region_sandwich(region) do
     statement = ["SELECT sandwich FROM sw WHERE pk = \"#{region}\""]
     {:ok, somestuffback} = corro_request("query", statement)
@@ -47,6 +44,12 @@ defmodule Corrodemo.CorroCalls do
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
     statement = ["UPDATE sw SET sandwich = \"#{sandwich}\" WHERE pk = \"#{region}\""]
+    {:ok, somestuffback} = corro_request("execute", statement)
+  end
+
+  def init_region_sandwich(region) do
+    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES (\"#{region}\", \"empty\")"]
+    IO.inspect(statement)
     {:ok, somestuffback} = corro_request("execute", statement)
   end
 

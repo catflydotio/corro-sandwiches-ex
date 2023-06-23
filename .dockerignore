@@ -33,7 +33,7 @@
 
 # Mix artifacts
 /_build/
-/deps/
+#/deps/
 *.ez
 
 # Generated on crash by the VM

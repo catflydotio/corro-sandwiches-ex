@@ -2,10 +2,10 @@ defmodule Corrodemo.GenSandwich do
   use GenServer
   @name __MODULE__
 
-  @sandwiches ["smoked meat", "smoked halloumi", "smoked salmon"]
+  # I'm hard-coding some sandwiches into some regions. Obviously you'd get the list for your region from somewhere else. They could be stored in corrosion, if you wanted to. :D
+  @sandwiches [{:yul, ["smoked meat", "halloumi", "saucisson"]}, {:yyz, ["burger", "brie and cranberry", "reuben"]}, {:ewr, ["avocado", "grilled cheese", "smoked salmon"]}, {:lax,["shiitake", "ham", "BLT"]}]
 
   def start_link(_opts \\ []) do
-    # This is the function that gets run by the supervisor when I run the server
     GenServer.start_link(Corrodemo.GenSandwich, [])
   end
 
@@ -21,7 +21,9 @@ defmodule Corrodemo.GenSandwich do
   end
 
   def handle_info(:do_the_swap, state) do
-    result = Enum.random(@sandwiches)
+    region = String.to_atom(System.get_env("FLY_REGION"))
+    #IO.inspect{"Checking region: #{region}"}
+    result = Enum.random(@sandwiches[region])
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "sandwichmsg", {:sandwich, result})
     # IO.inspect("is this doing anything?")
     do_the_swap()

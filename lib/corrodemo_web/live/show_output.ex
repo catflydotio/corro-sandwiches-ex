@@ -13,24 +13,27 @@ defmodule CorrodemoWeb.ShowOutputLive do
     Latest tests table data: <%= @thirteen_value %>
     <button phx-click="find_thirteen">update</button>
     </div> --%>
+    <h2>This is the Sandwich Cloud in <%= System.get_env("FLY_REGION") %></h2>
     <div>
-    The latest "sandwich" PubSub message: <%= @sandwichmsg %>
+    The latest local "sandwich" PubSub message: <%= @sandwichmsg %>
     </div>
-    <div>
+    <%!-- <div>
     The latest message from Corrosion: <%= @corromsg %>
+    </div> --%>
+    <div>
+    yyz sandwich: <%= @yyz %> yyz closest corro: <%= @corro_yyz %>
     </div>
     <div>
-    yyz sandwich: <%= @yyz %>
+    ewr sandwich: <%= @ewr %> ewr closest corro: <%= @corro_ewr %>
     </div>
     <div>
-    ewr sandwich: <%= @ewr %>
+    lax sandwich: <%= @lax %> lax closest corro: <%= @corro_lax %>
     </div>
     <div>
-    lax sandwich: <%= @lax %>
+    yul sandwich: <%= @yul %> yul closest corro: <%= @corro_yul %>
     </div>
-    <div>
-    yul sandwich: <%= @yul %>
-    </div>
+
+
     """
   end
 
@@ -38,7 +41,8 @@ defmodule CorrodemoWeb.ShowOutputLive do
     temperature = 500
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "fromcorro")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")
-    {:ok, assign(socket, temperature: temperature, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", sandwichmsg: "empty bread", corromsg: "blank", yyz: "blank", ewr: "blank", lax: "blank", yul: "blank")}
+    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
+    {:ok, assign(socket, temperature: temperature, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", sandwichmsg: "empty bread", corromsg: "blank", yyz: "blank", ewr: "blank", lax: "blank", yul: "blank", corro_yyz: "", corro_ewr: "", corro_lax: "", corro_yul: "")}
   end
 
   def handle_event("inc_temperature", _params, socket) do
@@ -57,7 +61,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   end
 
   def handle_info({:sandwich, message}, socket) do
-    IO.puts "LiveView getting the local sandwich: #{message}"
+    #IO.puts "LiveView getting the local sandwich: #{message}"
     {:noreply, assign(socket, sandwichmsg: message)}
   end
 
@@ -70,5 +74,16 @@ defmodule CorrodemoWeb.ShowOutputLive do
     IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
     {:noreply, assign(socket, String.to_existing_atom(region), sandwich)}
   end
+
+
+  def handle_info({:corro_ip, %{region: region, ip: ip}}, socket) do
+    IO.puts "LiveView getting a corrosion IP over PubSub: #{ip}"
+    {:noreply, assign(socket, String.to_atom("corro_" <> region), ip)}
+  end
+
+
+
+
+
 
 end

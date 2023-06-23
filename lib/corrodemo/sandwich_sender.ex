@@ -12,13 +12,16 @@ defmodule Corrodemo.SandwichSender do
   def init(_opts) do
     {:ok, {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}}
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg topic")
+    region = System.get_env("FLY_REGION")
+    IO.inspect("About to call init region sandwich #{region}")
+    Corrodemo.CorroCalls.init_region_sandwich(region)
   end
 
   # Callbacks
 
   def handle_info({:sandwich, message}, state) do
-     IO.puts("Sandwich sender received sandwich message #{message}")
-     fly_region = "yul" #System.get_env("FLY_REGION")
+     #IO.puts("Sandwich sender received #{message} by PubSub")
+     fly_region = System.get_env("FLY_REGION")
     #  IO.inspect(fly_region)
     #  IO.inspect(message)
      Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message)
