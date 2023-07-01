@@ -36,8 +36,6 @@ ENV MIX_ENV="prod"
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
-# Instead of getting deps fresh, copy them from local dir because 
-# I need one line changed in websockex to use IPv6
 # RUN mix deps.get --only $MIX_ENV
 COPY deps deps
 RUN mkdir config

@@ -1,4 +1,11 @@
 defmodule Corrodemo.CheckCorro do
+  # Took this out of the application start function.
+  # Wrote this to check the 6PN address of the nearest corrosion. It does that,
+  # but I don't necessarily want to keep checking that.
+  # Better would be to get the IP once on subscription. Could go further and
+  # try comparing the subscribed instance to the current top1.nearest.of. But
+  # that's really just something you could do, not something I have a lot of
+  # use for.
   use GenServer
   @name __MODULE__
 
@@ -35,9 +42,6 @@ defmodule Corrodemo.CheckCorro do
     |> Enum.join(":")
     |> String.downcase()
     |> IO.inspect()
-
-    # {:ok, _, _, address}  Enum.map(address, &to_hex/1)
-
   end
 
   defp v6_to_hex(ip_tuple) do

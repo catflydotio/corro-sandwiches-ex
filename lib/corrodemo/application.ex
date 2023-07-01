@@ -17,7 +17,6 @@ defmodule Corrodemo.Application do
         pools: %{
             default: [conn_opts: [transport_opts: [inet6: true]]]
         }},
-
       # Start the Endpoint (http/https)
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
@@ -27,8 +26,8 @@ defmodule Corrodemo.Application do
       Corrodemo.CorroSockets,
       Corrodemo.GenSandwich,
       Corrodemo.SandwichSender,
-      Corrodemo.CheckCorro
-
+      Corrodemo.FriendFinder
+      # Corrodemo.CheckCorro
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

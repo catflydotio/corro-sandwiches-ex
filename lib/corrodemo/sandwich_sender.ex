@@ -2,7 +2,7 @@ defmodule Corrodemo.SandwichSender do
   use GenServer
   import Corrodemo.CorroCalls
 
-  @name __MODULE__
+  # @name __MODULE__
 
   def start_link(_opts \\ []) do
     # This is the function that gets run by the supervisor when I run the server

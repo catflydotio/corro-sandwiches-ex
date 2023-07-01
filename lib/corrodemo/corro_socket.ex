@@ -11,7 +11,7 @@ defmodule Corrodemo.CorroSockets do
     # This is the function that gets run by the supervisor when I run the server
     # so I guess I have to include add_sub.
    {:ok, pid} = WebSockex.start_link(subscribe_endpoint, __MODULE__, %{}, opts)
-   add_sub(pid)
+    add_sub(pid)
   end
 
   def add_sub(pid) do

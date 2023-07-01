@@ -49,7 +49,7 @@ defmodule Corrodemo.CorroCalls do
 
   def init_region_sandwich(region) do
     statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES (\"#{region}\", \"empty\")"]
-    IO.inspect(statement)
+    # IO.inspect(statement)
     {:ok, somestuffback} = corro_request("execute", statement)
   end
 

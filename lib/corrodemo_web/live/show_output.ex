@@ -2,6 +2,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   # In Phoenix v1.6+ apps, the line is typically: use MyAppWeb, :live_view
   use Phoenix.LiveView
   import Corrodemo.CorroCalls
+  import Corrodemo.FriendFinder
 
   def render(assigns) do
     ~H"""
@@ -13,43 +14,54 @@ defmodule CorrodemoWeb.ShowOutputLive do
     Latest tests table data: <%= @thirteen_value %>
     <button phx-click="find_thirteen">update</button>
     </div> --%>
-    <h2>This is the Sandwich Cloud in <%= System.get_env("FLY_REGION") %></h2>
+    <h2>This is the Sandwich Cloud in <%= @local_region %></h2>
+    <div>
+    This app is also running in:
+    <%= for reg <- @other_regions do %>
+      <%= reg %>&nbsp;
+    <% end %>
+    </div>
+    <div>
+    The ctestcorro corrosion cluster is running in:
+    <%= for reg <- @corro_regions do %>
+      <%= reg %>&nbsp;
+    <% end %>
+    </div>
     <div>
     The latest local "sandwich" PubSub message: <%= @sandwichmsg %>
     </div>
     <%!-- <div>
     The latest message from Corrosion: <%= @corromsg %>
     </div> --%>
-    <div>
-    yyz sandwich: <%= @yyz %> yyz closest corro: <%= @corro_yyz %>
-    </div>
-    <div>
-    ewr sandwich: <%= @ewr %> ewr closest corro: <%= @corro_ewr %>
-    </div>
-    <div>
-    lax sandwich: <%= @lax %> lax closest corro: <%= @corro_lax %>
-    </div>
-    <div>
-    yul sandwich: <%= @yul %> yul closest corro: <%= @corro_yul %>
-    </div>
-
+    <%= for {region, sandwich} <- @kvs do %>
+      <div>
+        <%= region %> sandwich: <%= sandwich %>
+      </div>
+    <% end %>
+    <%!-- <div>
+    The latest <%= @local_region %> sandwich from Corrosion: <%= @local_corrosion_sandwich %>
+    </div> --%>
 
     """
   end
 
   def mount(_params, _session, socket) do
-    temperature = 500
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "fromcorro")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")
-    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
-    {:ok, assign(socket, temperature: temperature, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", sandwichmsg: "empty bread", corromsg: "blank", yyz: "blank", ewr: "blank", lax: "blank", yul: "blank", corro_yyz: "", corro_ewr: "", corro_lax: "", corro_yul: "")}
+    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "friend_regions")
+    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corro_regions")
+    # Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
+    init_regions()
+    {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: System.get_env("FLY_REGION"), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [])}
+    # , yyz: "blank", ewr: "blank", lax: "blank", yul: "blank"
   end
 
-  def handle_event("inc_temperature", _params, socket) do
-    # The generic response is of the form {:noreply, socket}
-    # You can also return a reply, a map, and a socket, e.g.
-    # https://elixirforum.com/t/use-case-for-returning-reply-map-socket-in-handle-event-callback/42917/2
-     {:noreply, update(socket, :temperature, &(&1 + 1))}
+  defp init_regions() do
+    IO.inspect("this is the init_regions function")
+    {:ok, other_regions} = Corrodemo.FriendFinder.check_regions()
+    # Enum.each(region_list, fn region ->
+    #   assign_new(socket, String.to_atom(region), "initialised")
+    # end)
   end
 
   # find_thirteen is a test handler to make sure I can get a value with an API request
@@ -70,20 +82,36 @@ defmodule CorrodemoWeb.ShowOutputLive do
   #   {:noreply, assign(socket, corromsg: message)}
   # end
 
+  # This sets the value of an existing assign with a region name. Trying to
+  # replace it with an assign
+  # def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
+  #   IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
+  #   {:noreply, assign(socket, String.to_atom(region), sandwich)}
+  # end
+
   def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
-    IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
-    {:noreply, assign(socket, String.to_existing_atom(region), sandwich)}
+    # IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
+    updated_kvs = Map.put(socket.assigns.kvs, region, sandwich)
+    # thing = Code.eval_string(updated_kvs) # |> elem(0)
+    # IO.inspect(updated_kvs)
+    {:noreply, assign(socket, :kvs, updated_kvs)}
   end
 
-
-  def handle_info({:corro_ip, %{region: region, ip: ip}}, socket) do
-    IO.puts "LiveView getting a corrosion IP over PubSub: #{ip}"
-    {:noreply, assign(socket, String.to_atom("corro_" <> region), ip)}
+  def handle_info({:other_regions, other_regions}, socket) do
+    # IO.puts "LiveView getting region list from PubSub: #{other_regions}"
+    {:noreply, assign(socket, :other_regions, other_regions)}
   end
 
+  def handle_info({:corro_regions, corro_regions}, socket) do
+    # IO.puts "LiveView getting region list from PubSub: #{other_regions}"
+    {:noreply, assign(socket, :corro_regions, corro_regions)}
+  end
 
-
-
-
+  # This is inactive for now (see check_corro module). If activating,
+  # also uncomment the PubSub subscription to corrosion_ip up top
+  # def handle_info({:corro_ip, %{region: region, ip: ip}}, socket) do
+  #   IO.puts "LiveView getting a corrosion IP over PubSub: #{ip}"
+  #   {:noreply, assign(socket, String.to_atom("corro_" <> region), ip)}
+  # end
 
 end
