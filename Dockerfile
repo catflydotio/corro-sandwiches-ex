@@ -6,6 +6,7 @@ ARG DEBIAN_VERSION=bullseye-20230522-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
+
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
@@ -51,9 +52,15 @@ COPY config/runtime.exs config/
 COPY rel rel
 RUN mix release
 
+## For Corrosion:
+# just sqlite3 -- update this if Corrosion dockerfile gets updated
+FROM keinos/sqlite3:3.42.0 as sqlite3
+
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
+
+ARG CORRO_DIR=/Users/chris/Corrosion/corrosion2
 
 RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
@@ -75,10 +82,6 @@ ENV MIX_ENV="prod"
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/corrodemo ./
 
 #=======Corrosion===========
-
-# just sqlite3 -- update this if Corrosion dockerfile gets updated
-FROM keinos/sqlite3:3.42.0 as sqlite3
-
 # Runtime image
 #FROM debian:bullseye-slim 
 
@@ -97,16 +100,17 @@ WORKDIR /app
 COPY config.toml /app/config.toml
 COPY schemas /app/schemas
 
-# Get compiled binaries from builder's cargo install directory
-COPY ${CORRO_DIR}/corrosion /app/corrosion
-
+# Get compiled binary
+COPY --chown=nobody --chmod=0755 corrosion /app/corrosion
 
 #====Back to Phoenix stuff
 ENTRYPOINT ["/entrypoint"]
 
 USER nobody
 
-CMD ["/app/bin/server"]
+#CMD ["/app/bin/server"]
+
+CMD ["sleep", "infinity"]
 
 # Appended by flyctl
 ENV ECTO_IPV6 true
