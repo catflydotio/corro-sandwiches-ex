@@ -7,17 +7,23 @@ app = "corro-sandwiches-ex"
 primary_region = "yyz"
 kill_signal = "SIGTERM"
 
+[mounts]
+source = "corro_data"
+destination = "/var/lib/corrosion"
 
 [deploy]
   strategy = "immediate"
 
 [env]
-  CORRO_BASEURL = "http://top1.nearest.of.ctestcorro.internal:8080"
+  CORRO_BUILTIN = "1"
+  CORRO_BASEURL = "http://localhost:8080"
   PHX_HOST = "corro-sandwiches-ex.fly.dev"
-  PORT = "8080"
+  PORT = "8081"
+  RUST_BACKTRACE = "1"
+# RUST_LOG="info,foca=debug"
 
 [http_service]
-  internal_port = 8080
+  internal_port = 8081
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
@@ -27,3 +33,7 @@ kill_signal = "SIGTERM"
     type = "connections"
     hard_limit = 1000
     soft_limit = 1000
+
+[metrics]
+  port = 9090
+  path = "/"

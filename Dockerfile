@@ -1,16 +1,4 @@
-# Find eligible builder and runner images on Docker Hub. We use Ubuntu/Debian
-# instead of Alpine to avoid DNS resolution issues in production.
-#
-# https://hub.docker.com/r/hexpm/elixir/tags?page=1&name=ubuntu
-# https://hub.docker.com/_/ubuntu?tab=tags
-#
-# This file is based on these images:
-#
-#   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
-#   - https://hub.docker.com/_/debian?tab=tags&page=1&name=bullseye-20230522-slim - for the release image
-#   - https://pkgs.org/ - resource for finding needed packages
-#   - Ex: hexpm/elixir:1.14.5-erlang-25.3.2-debian-bullseye-20230522-slim
-#
+# These versions were picked by flyctl in June 2023
 ARG ELIXIR_VERSION=1.14.5
 ARG OTP_VERSION=25.3.2
 ARG DEBIAN_VERSION=bullseye-20230522-slim
@@ -37,6 +25,7 @@ ENV MIX_ENV="prod"
 # install mix dependencies
 COPY mix.exs mix.lock ./
 # RUN mix deps.get --only $MIX_ENV
+# At the moment (June 2023 websockex is modified so don't get it fresh)
 COPY deps deps
 RUN mkdir config
 
@@ -47,9 +36,7 @@ COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
 COPY priv priv
-
 COPY lib lib
-
 COPY assets assets
 
 # compile assets
@@ -86,6 +73,36 @@ ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/corrodemo ./
+
+#=======Corrosion===========
+
+# just sqlite3 -- update this if Corrosion dockerfile gets updated
+FROM keinos/sqlite3:3.42.0 as sqlite3
+
+# Runtime image
+#FROM debian:bullseye-slim 
+
+COPY --from=sqlite3 /usr/bin/sqlite3 /usr/bin/sqlite3
+#COPY --from=builder /usr/local/bin/nperf /usr/local/bin/nperf
+
+# Run as "corrosion" user
+RUN useradd -ms /bin/bash corrosion
+
+COPY /entrypoint.sh /entrypoint
+
+USER corrosion
+WORKDIR /app
+
+# need a config.toml and schemas file prepped in root of project
+COPY config.toml /app/config.toml
+COPY schemas /app/schemas
+
+# Get compiled binaries from builder's cargo install directory
+COPY ${CORRO_DIR}/corrosion /app/corrosion
+
+
+#====Back to Phoenix stuff
+ENTRYPOINT ["/entrypoint"]
 
 USER nobody
 

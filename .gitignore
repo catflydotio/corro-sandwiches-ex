@@ -35,3 +35,6 @@ corrodemo-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Corrosion stuff
+/corrosion2/.buildkite
+/corrosion2/.github

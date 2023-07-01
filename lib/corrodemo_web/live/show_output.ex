@@ -6,33 +6,24 @@ defmodule CorrodemoWeb.ShowOutputLive do
 
   def render(assigns) do
     ~H"""
-    <%!-- <div>
-    Current temperature: <%= @temperature %>
-    <button phx-click="inc_temperature">+</button>
-    </div> --%>
-    <%!-- <div>
-    Latest tests table data: <%= @thirteen_value %>
-    <button phx-click="find_thirteen">update</button>
-    </div> --%>
     <h2>This is the Sandwich Cloud in <%= @local_region %></h2>
     <div>
-    This app is also running in:
-    <%= for reg <- @other_regions do %>
-      <%= reg %>&nbsp;
+      This app is also running in:
+      <%= for reg <- @other_regions do %>
+        <%= reg %>&nbsp;
+      <% end %>
+    </div>
+    <%= unless System.get_env(CORRO_BUILTIN) == "1" do %>
+      <div>
+        The ctestcorro corrosion cluster is running in:
+        <%= for reg <- @corro_regions do %>
+          <%= reg %>&nbsp;
+        <% end %>
+      </div>
     <% end %>
-    </div>
     <div>
-    The ctestcorro corrosion cluster is running in:
-    <%= for reg <- @corro_regions do %>
-      <%= reg %>&nbsp;
-    <% end %>
+      The latest local "sandwich" PubSub message: <%= @sandwichmsg %>
     </div>
-    <div>
-    The latest local "sandwich" PubSub message: <%= @sandwichmsg %>
-    </div>
-    <%!-- <div>
-    The latest message from Corrosion: <%= @corromsg %>
-    </div> --%>
     <%= for {region, sandwich} <- @kvs do %>
       <div>
         <%= region %> sandwich: <%= sandwich %>

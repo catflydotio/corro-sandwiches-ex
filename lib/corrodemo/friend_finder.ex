@@ -18,10 +18,13 @@ defmodule Corrodemo.FriendFinder do
 
   def handle_info(:broadcast_regions, state) do
     {:ok, other_regions} = check_regions()
-    {:ok, corro_regions} = check_corrosion_regions()
     #IO.inspect(IEx.Info.info(other_regions))
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "friend_regions", {:other_regions, other_regions})
-    Phoenix.PubSub.broadcast(Corrodemo.PubSub, "corro_regions", {:corro_regions, corro_regions})
+    IO.puts("friend_finder handle_info checking CORRO_BUILTIN: #{System.get_env(CORRO_BUILTIN)}")
+    unless System.get_env(CORRO_BUILTIN) == "1" do
+        {:ok, corro_regions} = check_corrosion_regions()
+        Phoenix.PubSub.broadcast(Corrodemo.PubSub, "corro_regions", {:corro_regions, corro_regions})
+    end
     broadcast_regions()
     {:noreply, state}
 
@@ -38,10 +41,10 @@ defmodule Corrodemo.FriendFinder do
 
   def check_regions() do
     home_region = System.get_env("FLY_REGION")
+    this_app = System.get_env("FLY_APP_NAME") #oh, I had some trouble getting inet_res to work with a variable. That's why the app name is hardcoded in the next line.
     {:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.corro-sandwiches-ex.internal', :txt)
-    # {:hostent, 'regions.corrodemo.internal', [], :txt, 1, [['ewr,lax,yul,yyz']]}
+    # {:hostent, 'regions.<app-name>.internal', [], :txt, 1, [['ewr,lax,yul,yyz']]}
     other_regions = List.first(region_list)
-    # |> List.first()
     |> List.to_string()
     |> String.split(",")
     # |> IO.inspect(label: "app regions")
