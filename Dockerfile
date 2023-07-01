@@ -62,7 +62,7 @@ FROM ${RUNNER_IMAGE}
 
 ARG CORRO_DIR=/Users/chris/Corrosion/corrosion2
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales nano procps dnsutils curl \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
@@ -72,14 +72,17 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+# Run as "corrosion" user
+RUN useradd -ms /bin/bash corrosion
+
 WORKDIR "/app"
-RUN chown nobody /app
+RUN chown corrosion /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/corrodemo ./
+COPY --from=builder --chown=corrosion:root /app/_build/${MIX_ENV}/rel/corrodemo ./
 
 #=======Corrosion===========
 # Runtime image
@@ -88,29 +91,28 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/corrodemo ./
 COPY --from=sqlite3 /usr/bin/sqlite3 /usr/bin/sqlite3
 #COPY --from=builder /usr/local/bin/nperf /usr/local/bin/nperf
 
-# Run as "corrosion" user
-RUN useradd -ms /bin/bash corrosion
-
 COPY /entrypoint.sh /entrypoint
 
 USER corrosion
 WORKDIR /app
 
 # need a config.toml and schemas file prepped in root of project
-COPY config.toml /app/config.toml
+COPY corrosion.toml /app/corrosion.toml
 COPY schemas /app/schemas
 
 # Get compiled binary
-COPY --chown=nobody --chmod=0755 corrosion /app/corrosion
+COPY --chown=corrosion:root --chmod=0755 corrosion /app/corrosion
+
+
+USER corrosion
+
 
 #====Back to Phoenix stuff
 ENTRYPOINT ["/entrypoint"]
 
-USER nobody
-
 #CMD ["/app/bin/server"]
 
-CMD ["sleep", "infinity"]
+# CMD ["sleep", "infinity"]
 
 # Appended by flyctl
 ENV ECTO_IPV6 true

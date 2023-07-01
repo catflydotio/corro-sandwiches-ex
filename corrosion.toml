@@ -1,13 +1,13 @@
 db_path = "/var/lib/corrosion/state.db"
 
-gossip_addr = "fly-local-6pn:8787"
+# gossip_addr = "fly-local-6pn:8787"
 api_addr = "[::]:8081"
 
 admin_path = "/app/admin.sock"
 
 metrics_addr = "0.0.0.0:9090"
 
-bootstrap = ["$FLY_APP_NAME.internal:8787"]
+bootstrap = ["sandwich-builtin.internal:8787"]
 
 schema_paths = ["/app/schemas"]
 
