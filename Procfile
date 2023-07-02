@@ -1,2 +1,2 @@
-elixir: /app/bin/server 
 corrosion: /app/corrosion agent
+elixir: /app/bin/server

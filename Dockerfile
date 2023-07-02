@@ -54,8 +54,8 @@ RUN mix release
 
 
 ## Get Overmind
-ADD https://github.com/DarthSim/overmind/releases/download/v2.4.0/overmind-v2.4.0-linux-amd64.gz /app/
-RUN gunzip overmind-v2.4.0-linux-amd64.gz 
+#ADD https://github.com/DarthSim/overmind/releases/download/v2.4.0/overmind-v2.4.0-linux-amd64.gz /app/
+#RUN gunzip overmind-v2.4.0-linux-amd64.gz 
 
 ## For Corrosion:
 # just sqlite3 -- update this if Corrosion dockerfile gets updated
@@ -102,20 +102,18 @@ COPY /entrypoint.sh /entrypoint
 # need a config.toml and schemas file prepped in root of project
 COPY --chown=corrosion:corrosion --chmod=0755 corrosion.toml /app/corrosion.toml
 COPY --chown=corrosion:corrosion --chmod=0755 schemas /app/schemas
-
 # Get compiled binary
 COPY --chown=corrosion:corrosion --chmod=0755 corrosion /app/corrosion
 
-COPY --from=builder --chown=corrosion:corrosion --chmod=0755 /app/overmind-v2.4.0-linux-amd64 /app/overmind
+#COPY --from=builder --chown=corrosion:corrosion --chmod=0755 /app/overmind-v2.4.0-linux-amd64 /app/overmind
+COPY --chmod=0755 overmind-v2.4.0-linux-amd64 /app/overmind
 ADD Procfile /app/
 
 ENTRYPOINT ["/entrypoint"]
 CMD ["/app/overmind", "start"]
-
-
 #CMD ["/app/bin/server"]
-
-# CMD ["sleep", "infinity"]
+#CMD ["sleep", "infinity"]
+#CMD ["/app/corrosion", "agent"]
 
 # Appended by flyctl
 ENV ECTO_IPV6 true
