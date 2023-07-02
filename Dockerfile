@@ -9,7 +9,7 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
 FROM ${BUILDER_IMAGE} as builder
 
-# install build dependencies
+# install build dependencies for the Elixir app
 RUN apt-get update -y && apt-get install -y build-essential git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
@@ -66,8 +66,6 @@ FROM keinos/sqlite3:3.42.0 as sqlite3
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
-ARG CORRO_DIR=/Users/chris/Corrosion/corrosion2
-
 RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
 tmux \
 nano procps dnsutils curl \
@@ -83,14 +81,14 @@ ENV LC_ALL en_US.UTF-8
 # Run as "corrosion" user
 RUN useradd -ms /bin/bash corrosion
 
+USER corrosion
 WORKDIR "/app"
-RUN chown corrosion /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=corrosion:root /app/_build/${MIX_ENV}/rel/corrodemo ./
+COPY --from=builder --chown=corrosion:corrosion /app/_build/${MIX_ENV}/rel/corrodemo ./
 
 #=======Corrosion===========
 # Runtime image
@@ -99,26 +97,21 @@ COPY --from=builder --chown=corrosion:root /app/_build/${MIX_ENV}/rel/corrodemo 
 COPY --from=sqlite3 /usr/bin/sqlite3 /usr/bin/sqlite3
 #COPY --from=builder /usr/local/bin/nperf /usr/local/bin/nperf
 
-# COPY /entrypoint.sh /entrypoint
-
-USER corrosion
-WORKDIR /app
+COPY /entrypoint.sh /entrypoint
 
 # need a config.toml and schemas file prepped in root of project
-COPY corrosion.toml /app/corrosion.toml
-COPY schemas /app/schemas
+COPY --chown=corrosion:corrosion --chmod=0755 corrosion.toml /app/corrosion.toml
+COPY --chown=corrosion:corrosion --chmod=0755 schemas /app/schemas
 
 # Get compiled binary
-COPY --chown=corrosion:root --chmod=0755 corrosion /app/corrosion
- 
-USER corrosion
+COPY --chown=corrosion:corrosion --chmod=0755 corrosion /app/corrosion
 
-COPY --from=builder --chown=corrosion:root --chmod=0755 /app/overmind-v2.4.0-linux-amd64 /app/overmind
+COPY --from=builder --chown=corrosion:corrosion --chmod=0755 /app/overmind-v2.4.0-linux-amd64 /app/overmind
 ADD Procfile /app/
+
+ENTRYPOINT ["/entrypoint"]
 CMD ["/app/overmind", "start"]
 
-#====Back to Phoenix stuff
-# ENTRYPOINT ["/entrypoint"]
 
 #CMD ["/app/bin/server"]
 

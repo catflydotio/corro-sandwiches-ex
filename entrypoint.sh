@@ -1,11 +1,13 @@
 #!/bin/bash
 
-export GOSSIP_ADDR="[$(getent hosts fly-local-6pn | cut -d ' ' -f1)]:8787"
+sed -i '1s;^;gossip_addr = \"['${FLY_PRIVATE_IP}']:8787\"\n;' /app/corrosion.toml
 
-echo "Set GOSSIP_ADDR=$GOSSIP_ADDR"
+# echo -e 'gossip_addr = '$FLY_PRIVATE_IP':8787\n'$(cat /app/corrosion.toml) > /app/corrosion.toml
+exec "$@"
 
-# exec "$@"
+# set -m # to make job control work
+# /app/corrosion agent &
+# /app/bin/server &
+# fg %1 # gross!
 
-sleep infinity
-
-# ./corrosion agent
+#sleep infinity
