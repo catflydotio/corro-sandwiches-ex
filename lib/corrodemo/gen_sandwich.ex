@@ -1,13 +1,7 @@
 defmodule Corrodemo.GenSandwich do
   use GenServer
 
-  # I'm hard-coding some sandwiches into some regions. Obviously you'd get the list for your region from somewhere else. They could be stored in corrosion, if you wanted to. :D
-  # @sandwiches [{:yul, ["smoked meat", "halloumi", "saucisson"]}, {:yyz, ["burger", "brie and cranberry", "reuben"]}, {:ewr, ["avocado", "grilled cheese", "smoked salmon"]}, {:lax,["shiitake", "ham", "BLT"]}]
-
   @all_sandwiches ["smoked meat", "halloumi", "saucisson", "burger", "brie and cranberry", "reuben", "avocado", "grilled cheese", "smoked salmon", "shiitake", "ham", "BLT", "portobello"]
-
-  # @this_sandwiches Corrodemo.MenuInit.set_menu #Enum.take_random(@all_sandwiches, 3)
-
 
   def start_link(_opts \\ []) do
     GenServer.start_link(Corrodemo.GenSandwich, [])

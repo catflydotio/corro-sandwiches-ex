@@ -38,7 +38,7 @@ defmodule Corrodemo.CorroSockets do
   end
 
   def handle_frame({:binary, msg}, state) do
-    # IO.inspect(msg)
+    IO.inspect("Message from Corrosion: #{msg}")
     # IO.inspect(state)
     # This needs to handle SubscriptionMessage structs in response to changes
     # Here's a brittle version of that for a single value being updated in a

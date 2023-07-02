@@ -13,10 +13,10 @@ defmodule Corrodemo.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Corrodemo.PubSub},
       # Start Finch
-      {Finch, name: Corrodemo.Finch,
-        pools: %{
-            default: [conn_opts: [transport_opts: [inet6: true]]]
-        }},
+      {Finch, name: Corrodemo.Finch},
+        # pools: %{
+        #     default: [conn_opts: [transport_opts: [inet6: true]]]
+        # }},
       # Start the Endpoint (http/https)
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
