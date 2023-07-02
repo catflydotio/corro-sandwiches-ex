@@ -37,3 +37,7 @@ npm-debug.log
 
 # Corrosion stuff
 corrosion
+
+.DS_Store
+
+overmind-v*

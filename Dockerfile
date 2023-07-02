@@ -52,9 +52,15 @@ COPY config/runtime.exs config/
 COPY rel rel
 RUN mix release
 
+
+## Get Overmind
+ADD https://github.com/DarthSim/overmind/releases/download/v2.4.0/overmind-v2.4.0-linux-amd64.gz /app/
+RUN gunzip overmind-v2.4.0-linux-amd64.gz 
+
 ## For Corrosion:
 # just sqlite3 -- update this if Corrosion dockerfile gets updated
 FROM keinos/sqlite3:3.42.0 as sqlite3
+
 
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
@@ -62,7 +68,9 @@ FROM ${RUNNER_IMAGE}
 
 ARG CORRO_DIR=/Users/chris/Corrosion/corrosion2
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales nano procps dnsutils curl \
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+tmux \
+nano procps dnsutils curl \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
@@ -91,7 +99,7 @@ COPY --from=builder --chown=corrosion:root /app/_build/${MIX_ENV}/rel/corrodemo 
 COPY --from=sqlite3 /usr/bin/sqlite3 /usr/bin/sqlite3
 #COPY --from=builder /usr/local/bin/nperf /usr/local/bin/nperf
 
-COPY /entrypoint.sh /entrypoint
+# COPY /entrypoint.sh /entrypoint
 
 USER corrosion
 WORKDIR /app
@@ -102,13 +110,15 @@ COPY schemas /app/schemas
 
 # Get compiled binary
 COPY --chown=corrosion:root --chmod=0755 corrosion /app/corrosion
-
-
+ 
 USER corrosion
 
+COPY --from=builder --chown=corrosion:root --chmod=0755 /app/overmind-v2.4.0-linux-amd64 /app/overmind
+ADD Procfile /app/
+CMD ["/app/overmind", "start"]
 
 #====Back to Phoenix stuff
-ENTRYPOINT ["/entrypoint"]
+# ENTRYPOINT ["/entrypoint"]
 
 #CMD ["/app/bin/server"]
 
