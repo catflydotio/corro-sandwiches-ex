@@ -1,7 +1,6 @@
 db_path = "/var/lib/corrosion/state.db"
 
-# gossip_addr = "fly-local-6pn:8787"
-api_addr = "[::]:8081"
+api_addr = "[::]:8080"
 
 admin_path = "/app/admin.sock"
 
