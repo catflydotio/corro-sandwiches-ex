@@ -8,7 +8,7 @@ defmodule Corrodemo.GenSandwich do
   end
 
   def do_the_swap(menu) do
-    Process.send_after(self(), {:do_the_swap, menu}, 5000)
+    Process.send_after(self(), {:do_the_swap, menu}, 2000)
   end
 
   def init(_opts) do

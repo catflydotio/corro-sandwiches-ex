@@ -7,6 +7,7 @@ defmodule Corrodemo.Application do
 
   @impl true
   def start(_type, _args) do
+    # IO.puts("In application.ex: CORRO_BUILTIN = "<>System.get_env("CORRO_BUILTIN"))
     children = [
       # Start the Telemetry supervisor
       # DON'T actually, until can figure out how Corrosion and Elixir can both do metrics

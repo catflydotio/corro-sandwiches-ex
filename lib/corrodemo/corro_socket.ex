@@ -61,8 +61,6 @@ defmodule Corrodemo.CorroSockets do
     # Once that's figured out, get it to send an assign update to the LiveView
     # Broadcast over the "corro" pubsub topic
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, %{region: pk, sandwich: sandwich}})
-    # Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, "#{pk} = #{sandwich}"})
-    # Phoenix.PubSub.broadcast(Corrodemo.PubSub, "sandwichmsg", {:sandwich, result})
     # Websockex wants the end message to be like this:
     {:ok, data}
   end
