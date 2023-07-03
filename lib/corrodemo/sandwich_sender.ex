@@ -22,7 +22,7 @@ defmodule Corrodemo.SandwichSender do
   def handle_info({:sandwich, message}, state) do
      #IO.puts("Sandwich sender received #{message} by PubSub")
      fly_region = System.get_env("FLY_REGION")
-      IO.inspect(fly_region)
+      #IO.inspect(fly_region)
       IO.inspect(message)
      Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message)
     {:noreply, state}

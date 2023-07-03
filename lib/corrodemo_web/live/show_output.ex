@@ -13,7 +13,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
         <%= reg %>&nbsp;
       <% end %>
     </div>
-    <%= unless System.get_env(CORRO_BUILTIN) == "1" do %>
+    <%= unless System.get_env("CORRO_BUILTIN") == "1" do %>
       <div>
         The ctestcorro corrosion cluster is running in:
         <%= for reg <- @corro_regions do %>

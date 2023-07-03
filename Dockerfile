@@ -110,7 +110,7 @@ COPY --chmod=0755 overmind-v2.4.0-linux-amd64 /app/overmind
 ADD Procfile /app/
 
 ENTRYPOINT ["/entrypoint"]
-CMD ["/app/overmind", "start"]
+CMD ["/app/overmind", "start", "-N"]
 #CMD ["/app/bin/server"]
 #CMD ["sleep", "infinity"]
 #CMD ["/app/corrosion", "agent"]

@@ -9,14 +9,15 @@ defmodule Corrodemo.Application do
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
-      CorrodemoWeb.Telemetry,
+      # DON'T actually, until can figure out how Corrosion and Elixir can both do metrics
+      # CorrodemoWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Corrodemo.PubSub},
       # Start Finch
-      {Finch, name: Corrodemo.Finch},
-        # pools: %{
-        #     default: [conn_opts: [transport_opts: [inet6: true]]]
-        # }},
+      {Finch, name: Corrodemo.Finch,
+        pools: %{
+            default: [conn_opts: [transport_opts: [inet6: true]]]
+        }},
       # Start the Endpoint (http/https)
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)

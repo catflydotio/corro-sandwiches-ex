@@ -16,20 +16,27 @@ destination = "/var/lib/corrosion"
 
 [env]
   CORRO_BUILTIN = "1"
-  CORRO_BASEURL = "http://localhost:8080"
+  CORRO_BASEURL = "http://localhost:8081"
   PHX_HOST = "sandwich-builtin.fly.dev"
-  PORT = "8081"
+  PORT = "8080"
   RUST_BACKTRACE = "1"
 # RUST_LOG="info,foca=debug"
 
 [[services]]
-  internal_port = 8081
+  internal_port = 8080
   protocol = "tcp"
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
   [services.concurrency]
     type = "connections"
     hard_limit = 1000
