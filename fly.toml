@@ -11,8 +11,8 @@ kill_signal = "SIGTERM"
 source = "corro_data"
 destination = "/var/lib/corrosion"
 
-[deploy]
-  strategy = "immediate"
+# [deploy]
+#   strategy = "immediate"
 
 [env]
   CORRO_BUILTIN = "1"
