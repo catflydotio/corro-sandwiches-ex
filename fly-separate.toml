@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for corro-sandwiches-ex on 2023-06-29T19:08:20-04:00
+#
+# Use with a separate Corrosion V2 app; specify which one in the CORRO_BASEURL environment variable
+#
+
+app = "corro-sandwiches-ex"
+primary_region = "yyz"
+kill_signal = "SIGTERM"
+
+[env]
+  CORRO_BASEURL = "http://top1.nearest.of.ctestcorro.internal:8080"
+  PHX_HOST = "corro-sandwiches-ex.fly.dev"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 1000
+    soft_limit = 1000

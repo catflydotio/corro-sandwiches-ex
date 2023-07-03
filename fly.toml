@@ -17,6 +17,7 @@ destination = "/var/lib/corrosion"
 [env]
   CORRO_BUILTIN = "1"
   CORRO_BASEURL = "http://localhost:8081"
+# CORRO_BASEURL = "http://top1.nearest.of.ctestcorro.internal:8080"
   PHX_HOST = "sandwich-builtin.fly.dev"
   PORT = "8080"
   RUST_BACKTRACE = "1"
