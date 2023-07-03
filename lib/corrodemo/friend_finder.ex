@@ -20,15 +20,13 @@ defmodule Corrodemo.FriendFinder do
     {:ok, other_regions} = check_regions()
     #IO.inspect(IEx.Info.info(other_regions))
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "friend_regions", {:other_regions, other_regions})
-    IO.puts("friend_finder handle_info checking CORRO_BUILTIN: "<>System.get_env("CORRO_BUILTIN"))
     unless System.get_env("CORRO_BUILTIN") == "1" do
-      IO.puts("This shouldn't show up in all-in-one deployments!")
+      IO.puts("Checking corrosion regions")
         {:ok, corro_regions} = check_corrosion_regions()
         Phoenix.PubSub.broadcast(Corrodemo.PubSub, "corro_regions", {:corro_regions, corro_regions})
     end
     broadcast_regions()
     {:noreply, state}
-
   end
 
   def handle_info({:sandwich, message}, state) do
@@ -42,12 +40,11 @@ defmodule Corrodemo.FriendFinder do
 
   def check_regions() do
     home_region = System.get_env("FLY_REGION")
-    this_app = System.get_env("FLY_APP_NAME") #oh, I had some trouble getting inet_res to work with a variable. That's why the app name is hardcoded in the next line.
-
-        ## WATCH OUT FOR HARD-CODED CORROSION APP NAME!
+    this_app = System.get_env("FLY_APP_NAME")
     IO.inspect("FLY_APP_NAME is #{this_app}")
-    {:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.corro-sandwiches-ex.internal', :txt)
-    # {:hostent, 'regions.<app-name>.internal', [], :txt, 1, [['ewr,lax,yul,yyz']]}
+    app_regions_resolver = ":inet_res.getbyname('regions.#{System.get_env("FLY_APP_NAME")}.internal', :txt)"
+    {{:ok,  {_, _, _, _, _, region_list}}, []} = Code.eval_string(app_regions_resolver)
+    #{:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.corro-sandwiches-ex.internal', :txt)
     other_regions = List.first(region_list)
     |> List.to_string()
     |> String.split(",")
@@ -58,14 +55,10 @@ defmodule Corrodemo.FriendFinder do
   end
 
   def check_corrosion_regions() do
-
-    ## WATCH OUT FOR HARD-CODED CORROSION APP NAME!
     corro_regions_resolver = ":inet_res.getbyname('regions.#{System.get_env("FLY_CORROSION_APP")}.internal', :txt)"
-    IO.puts corro_regions_resolver
+    # IO.puts corro_regions_resolver
     {{:ok,  {_, _, _, _, _, region_list}}, []} = Code.eval_string(corro_regions_resolver)
-
     #{{:ok, {:hostent, 'regions.ctestcorro.internal', [], :txt, 1, [['mad,yyz']]}}, []}
-
     #{:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.ctestcorro.internal', :txt)
     # {:hostent, 'regions.corrodemo.internal', [], :txt, 1, [['ewr,lax,yul,yyz']]}
     regions = List.first(region_list)
