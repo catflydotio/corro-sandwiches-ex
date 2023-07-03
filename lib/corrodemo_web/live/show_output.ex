@@ -15,7 +15,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
     </div>
     <%= unless System.get_env("CORRO_BUILTIN") == "1" do %>
       <div>
-        The ctestcorro corrosion cluster is running in:
+        The <%=System.get_env("FLY_CORROSION_APP")%> corrosion cluster is running in:
         <%= for reg <- @corro_regions do %>
           <%= reg %>&nbsp;
         <% end %>
@@ -42,13 +42,13 @@ defmodule CorrodemoWeb.ShowOutputLive do
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "friend_regions")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corro_regions")
     # Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
-    init_regions()
+    #init_regions()
     {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: System.get_env("FLY_REGION"), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [])}
     # , yyz: "blank", ewr: "blank", lax: "blank", yul: "blank"
   end
 
-  defp init_regions() do
-    IO.inspect("this is the init_regions function")
+  defp check_other_regions() do
+    IO.inspect("this is the check_other_regions function in the liveview")
     {:ok, other_regions} = Corrodemo.FriendFinder.check_regions()
     # Enum.each(region_list, fn region ->
     #   assign_new(socket, String.to_atom(region), "initialised")

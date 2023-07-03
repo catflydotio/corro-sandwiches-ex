@@ -9,6 +9,7 @@ kill_signal = "SIGTERM"
 
 [env]
   CORRO_BUILTIN = "0"
+  FLY_CORROSION_APP = "ctestcorro"
   CORRO_BASEURL = "http://top1.nearest.of.ctestcorro.internal:8080"
   PHX_HOST = "corro-sandwiches-ex.fly.dev"
   PORT = "8080"
