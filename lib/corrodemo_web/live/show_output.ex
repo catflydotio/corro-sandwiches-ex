@@ -42,7 +42,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "friend_regions")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corro_regions")
     # Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
-    #init_regions()
+    init_app_regions(socket)
     {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: System.get_env("FLY_REGION"), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [])}
     # , yyz: "blank", ewr: "blank", lax: "blank", yul: "blank"
   end
@@ -53,6 +53,11 @@ defmodule CorrodemoWeb.ShowOutputLive do
     # Enum.each(region_list, fn region ->
     #   assign_new(socket, String.to_atom(region), "initialised")
     # end)
+  end
+
+  defp init_app_regions(socket) do
+    {:ok, other_regions} = Corrodemo.FriendFinder.check_regions()
+    {:noreply, assign(socket, :other_regions, other_regions)}
   end
 
   # find_thirteen is a test handler to make sure I can get a value with an API request
