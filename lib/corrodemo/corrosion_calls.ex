@@ -17,7 +17,7 @@ defmodule Corrodemo.CorroCalls do
     |> Finch.request(Corrodemo.Finch) do
       {:ok, %{status_code: resp.status, results: extract_results(resp.body), headers: resp.headers}}
     else
-      {:error, reason} -> {:error, %{reason: reason}}
+      {:error, resp} -> {:error, resp}
     end
   end
 
@@ -38,13 +38,18 @@ defmodule Corrodemo.CorroCalls do
     |> Map.get("values",[])
     |> List.first() # this may be unnecessarily clunky? idk!
     |> List.first()
-    # |> IO.inspect()
+    |> IO.inspect()
   end
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
     statement = ["UPDATE sw SET sandwich = \"#{sandwich}\" WHERE pk = \"#{region}\""]
-    {:ok, somestuffback} = corro_request("execute", statement)
+    case corro_request("execute", statement) do
+      {:ok, somestuffback} -> {:ok, somestuffback}
+      IO.puts("Uploaded sandwich to corrosion")
+      {:error, somestuffback} -> inspect(somestuffback) |> Logger.debug()
+    # {:error, %{reason: %Mint.TransportError{reason: :timeout}}}
+    end
   end
 
   def init_region_sandwich(region) do

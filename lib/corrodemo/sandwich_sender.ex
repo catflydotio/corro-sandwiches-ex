@@ -1,6 +1,7 @@
 defmodule Corrodemo.SandwichSender do
   use GenServer
   import Corrodemo.CorroCalls
+  require Logger
 
   # @name __MODULE__
 

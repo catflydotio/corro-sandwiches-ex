@@ -47,25 +47,19 @@ defmodule CorrodemoWeb.ShowOutputLive do
     # , yyz: "blank", ewr: "blank", lax: "blank", yul: "blank"
   end
 
-  defp check_other_regions() do
-    IO.inspect("this is the check_other_regions function in the liveview")
-    {:ok, other_regions} = Corrodemo.FriendFinder.check_regions()
-    # Enum.each(region_list, fn region ->
-    #   assign_new(socket, String.to_atom(region), "initialised")
-    # end)
-  end
+  # defp check_other_regions() do
+  #   IO.inspect("this is the check_other_regions function in the liveview")
+  #   {:ok, other_regions} = Corrodemo.FriendFinder.check_regions()
+  #   # Enum.each(region_list, fn region ->
+  #   #   assign_new(socket, String.to_atom(region), "initialised")
+  #   # end)
+  # end
 
   defp init_app_regions(socket) do
-    {:ok, other_regions} = Corrodemo.FriendFinder.check_regions()
-    {:noreply, assign(socket, :other_regions, other_regions)}
-  end
-
-  # find_thirteen is a test handler to make sure I can get a value with an API request
-  def handle_event("find_thirteen", _params, socket) do
-    {:ok, response} = Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM tests WHERE id = 13")
-    msg = response
-    # |> IO.inspect()
-    {:noreply, assign(socket, :thirteen_value, response.value)}
+    case Corrodemo.FriendFinder.check_regions() do
+      {:ok, other_regions} -> {:noreply, assign(socket, :other_regions, other_regions)}
+      _ -> IO.puts("init_app_regions didn't receive any regions from check_regions")
+    end
   end
 
   def handle_info({:sandwich, message}, socket) do
@@ -99,7 +93,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   end
 
   def handle_info({:corro_regions, corro_regions}, socket) do
-    # IO.puts "LiveView getting region list from PubSub: #{other_regions}"
+    # IO.puts "LiveView getting corrosion region list from PubSub: #{other_regions}"
     {:noreply, assign(socket, :corro_regions, corro_regions)}
   end
 

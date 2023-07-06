@@ -1,5 +1,7 @@
 defmodule Corrodemo.FriendFinder do
   use GenServer
+  require Logger
+
 
   # @name __MODULE__
 
@@ -17,15 +19,18 @@ defmodule Corrodemo.FriendFinder do
   end
 
   def handle_info(:broadcast_regions, state) do
-    {:ok, other_regions} = check_regions()
-    #IO.inspect(IEx.Info.info(other_regions))
-    Phoenix.PubSub.broadcast(Corrodemo.PubSub, "friend_regions", {:other_regions, other_regions})
-    unless System.get_env("CORRO_BUILTIN") == "1" do
-      IO.puts("Checking corrosion regions")
-        {:ok, corro_regions} = check_corrosion_regions()
-        Phoenix.PubSub.broadcast(Corrodemo.PubSub, "corro_regions", {:corro_regions, corro_regions})
+    case check_regions() do
+      {:ok, other_regions} ->
+        #IO.inspect(IEx.Info.info(other_regions))
+        Phoenix.PubSub.broadcast(Corrodemo.PubSub, "friend_regions", {:other_regions, other_regions})
+        unless System.get_env("CORRO_BUILTIN") == "1" do
+          IO.puts("Checking corrosion regions")
+            {:ok, corro_regions} = check_corrosion_regions()
+            Phoenix.PubSub.broadcast(Corrodemo.PubSub, "corro_regions", {:corro_regions, corro_regions})
+        end
+        broadcast_regions()
+        {:error, reason} -> Logger.info("Friend finder received an error from check_regions: #{reason}")
     end
-    broadcast_regions()
     {:noreply, state}
   end
 
@@ -43,15 +48,18 @@ defmodule Corrodemo.FriendFinder do
     this_app = System.get_env("FLY_APP_NAME")
     IO.inspect("FLY_APP_NAME is #{this_app}")
     app_regions_resolver = ":inet_res.getbyname('regions.#{System.get_env("FLY_APP_NAME")}.internal', :txt)"
-    {{:ok,  {_, _, _, _, _, region_list}}, []} = Code.eval_string(app_regions_resolver)
-    #{:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.corro-sandwiches-ex.internal', :txt)
-    other_regions = List.first(region_list)
-    |> List.to_string()
-    |> String.split(",")
-    # |> IO.inspect(label: "app regions")
-    |> Enum.reject(& match?(^home_region, &1))
-    |> IO.inspect(label: "other regions")
-    {:ok, other_regions}
+    case Code.eval_string(app_regions_resolver) do
+      {{:ok,  {_, _, _, _, _, region_list}}, []} -> other_regions = List.first(region_list)
+      |> List.to_string()
+      |> String.split(",")
+      # |> IO.inspect(label: "app regions")
+      |> Enum.reject(& match?(^home_region, &1))
+      |> IO.inspect(label: "other regions")
+      {:ok, other_regions}
+      {:ok} -> {:ok, []}
+      {{:error, :nxdomain}, []} -> {:error, :nxdomain}
+    end
+
   end
 
   def check_corrosion_regions() do

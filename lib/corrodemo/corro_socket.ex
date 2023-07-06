@@ -8,10 +8,14 @@ defmodule Corrodemo.CorroSockets do
   def start_link(opts \\ []) do
     subscribe_endpoint = "#{System.get_env("CORRO_BASEURL")}/v1/subscribe"
     IO.inspect(subscribe_endpoint)
+    IO.inspect("corro_socket opts: #{opts}")
     # This is the function that gets run by the supervisor when I run the server
     # so I guess I have to include add_sub.
-   {:ok, pid} = WebSockex.start_link(subscribe_endpoint, __MODULE__, %{}, opts)
-    add_sub(pid)
+    case WebSockex.start_link(subscribe_endpoint, __MODULE__, %{}, opts) do
+      {:ok, pid} -> add_sub(pid)
+      {:error, reason} -> inspect(reason) |> Logger.debug()
+      # IO.inspect("Couldn't start websocket connection: #{reason}")
+    end
   end
 
   def add_sub(pid) do
