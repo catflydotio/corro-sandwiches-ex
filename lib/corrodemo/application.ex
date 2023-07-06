@@ -26,7 +26,7 @@ defmodule Corrodemo.Application do
       ## CAN: starting up the websocket connection to Corrosion
       ## the supervisor will run start_link
       #Corrodemo.CorroPort,
-      Corrodemo.CorroSockets,
+      #Corrodemo.CorroSockets,
       Corrodemo.GenSandwich,
       Corrodemo.SandwichSender,
       Corrodemo.FriendFinder

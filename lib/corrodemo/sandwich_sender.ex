@@ -11,11 +11,19 @@ defmodule Corrodemo.SandwichSender do
   end
 
   def init(_opts) do
-    {:ok, {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}}
+    {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg topic")
     region = System.get_env("FLY_REGION")
     IO.inspect("About to call init region sandwich #{region}")
-    Corrodemo.CorroCalls.init_region_sandwich(region)
+    case Corrodemo.CorroCalls.init_region_sandwich(region) do
+      {:ok} 
+        -> IO.puts("Initialised region sandwich")
+        {:ok, %{}}
+      {:error, reason} 
+        -> IO.puts("Couldn't initialise region sandwich: #{reason}")
+        {:ok, %{}}
+    end
+
   end
 
   # Callbacks

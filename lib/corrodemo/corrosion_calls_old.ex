@@ -1,30 +1,38 @@
-defmodule Corrodemo.CorroCalls do
+defmodule Corrodemo.CorroCallsOld do
   require Logger
+
+
+  # Corrosion wants JSON, Finch wants, I think, a list.
+  # Example:
+  # iex(85)> Corrodemo.CorroCalls.format_statement("SELECT * FROM TESTS")
+  # "[\"SELECT * FROM TESTS\"]"
+  def format_statement(statement) do
+    "[\"" <> statement <> "\"]"
+  end
 
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
-   corro_baseurl = System.get_env("CORRO_BASEURL") |> IO.inspect()
+    corro_baseurl = System.get_env("CORRO_BASEURL")
     cond do 
-      corro_baseurl ->
+      String.length(corro_baseurl) > 0 ->
         corro_db_url = "#{corro_baseurl}/db/"
-        with {:ok, resp} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
-          |> Finch.request(Corrodemo.Finch) do
-            {:ok, %{status_code: resp.status, body: resp.body, headers: resp.headers}}
-            # {:error, resp} -> {:error, resp}
+        # IO.inspect("About to inspect corro db url")
+        # IO.inspect(corro_db_url)
+        with {:ok, resp} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement)) |> IO.inspect()
+        |> Finch.request(Corrodemo.Finch) do
+          {:ok, %{status_code: resp.status, results: extract_results(resp.body), headers: resp.headers}}
         end
-      true -> {:error, "Looks like CORRO_BASEURL isn't set"}
+      String.length(corro_baseurl) == 0 -> {:error, "Looks like CORRO_BASEURL isn't set"}
     end
   end
 
-  def get_results() do
-
-  end
-
-  def extract_body(resp) do
-    resp.body
+  def extract_results(body) do
+    something = body
     |> Jason.decode!()
     |> Map.get("results",[])
     |> List.first()
+
+    # IO.inspect(something)
     # IO.inspect("above: extract_results work so far")
   end
 
@@ -54,7 +62,7 @@ defmodule Corrodemo.CorroCalls do
     # IO.inspect(statement)
     case corro_request("execute", statement) do
       {:ok, somestuffback} -> inspect(somestuffback) |> Logger.debug()
-      {:error, reason} -> {:error, reason}
+      {:ok} ->
     end
   end
 

@@ -6,17 +6,29 @@ defmodule Corrodemo.CorroSockets do
   # @corro_sub_endpoint "http://localhost:8080/v1/subscribe"
 
   def start_link(opts \\ []) do
+    subscribe_corro(3, opts)
+  end
+
+  def subscribe_corro(retries, opts) when retries > 0 do
     subscribe_endpoint = "#{System.get_env("CORRO_BASEURL")}/v1/subscribe"
     IO.inspect(subscribe_endpoint)
-    IO.inspect("corro_socket opts: #{opts}")
+    #inspect(opts) |> Logger.info()
     # This is the function that gets run by the supervisor when I run the server
     # so I guess I have to include add_sub.
     case WebSockex.start_link(subscribe_endpoint, __MODULE__, %{}, opts) do
       {:ok, pid} -> add_sub(pid)
-      {:error, reason} -> inspect(reason) |> Logger.debug()
-      # IO.inspect("Couldn't start websocket connection: #{reason}")
+      {:error, reason} -> Logger.debug inspect(reason)
+      IO.inspect("Couldn't start websocket connection; trying again #{retries - 1} times.")
+      Process.sleep(2000)
+      subscribe_corro(retries - 1, opts)
     end
   end
+
+  def subscribe_corro(0, opts) do
+    IO.puts("Couldn't subscribe to corrosion.")
+    {:ok}
+  end
+
 
   def add_sub(pid) do
     msgstruct = %{
