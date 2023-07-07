@@ -11,9 +11,6 @@ defmodule Corrodemo.CorroCalls do
     end
   end
 
-
-
-
   def execute_corro(statement) do
     with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("execute", statement),
       {:ok, results} <- extract_exec_results(body) do
@@ -30,12 +27,13 @@ defmodule Corrodemo.CorroCalls do
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
     statement = ["UPDATE sw SET sandwich = \"#{sandwich}\" WHERE pk = \"#{region}\""]
-    case corro_request("execute", statement) do
-      {:ok, somestuffback} -> {:ok, somestuffback}
-      IO.puts("Uploaded sandwich to corrosion")
-      {:error, somestuffback} -> inspect(somestuffback) |> Logger.debug()
-    # {:error, %{reason: %Mint.TransportError{reason: :timeout}}}
-    end
+    execute_corro(statement)
+    # case corro_request("execute", statement) do
+    #   {:ok, somestuffback} -> {:ok, somestuffback}
+    #   IO.puts("Uploaded sandwich to corrosion")
+    #   {:error, somestuffback} -> inspect(somestuffback) |> Logger.debug()
+    # # {:error, %{reason: %Mint.TransportError{reason: :timeout}}}
+    # end
   end
 
   def get_region_sandwich(region) do
