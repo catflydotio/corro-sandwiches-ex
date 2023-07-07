@@ -20,6 +20,7 @@ defmodule Corrodemo.Application do
             default: [conn_opts: [transport_opts: [inet6: true]]]
         }},
       # Start the Endpoint (http/https)
+      Corrodemo.StartupChecks,
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
       # {Corrodemo.Worker, arg}

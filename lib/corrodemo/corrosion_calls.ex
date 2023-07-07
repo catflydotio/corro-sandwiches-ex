@@ -3,39 +3,28 @@ defmodule Corrodemo.CorroCalls do
 
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
-   corro_baseurl = System.get_env("CORRO_BASEURL") |> IO.inspect()
-    cond do 
-      corro_baseurl ->
-        corro_db_url = "#{corro_baseurl}/db/"
-        with {:ok, resp} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
-          |> Finch.request(Corrodemo.Finch) do
-            {:ok, %{status_code: resp.status, body: resp.body, headers: resp.headers}}
-            # {:error, resp} -> {:error, resp}
-        end
-      true -> {:error, "Looks like CORRO_BASEURL isn't set"}
+    corro_db_url = "#{System.get_env("CORRO_BASEURL")}/db/"
+    with {:ok, resp} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
+      |> Finch.request(Corrodemo.Finch) do
+        {:ok, %{status_code: resp.status, body: resp.body, headers: resp.headers}}
+        # {:error, resp} -> {:error, resp}
     end
   end
 
-  def get_results() do
 
+
+
+  def execute_corro(statement) do
+    with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("execute", statement),
+      {:ok, results} <- extract_exec_results(body) do
+          {:ok, results}
+    end
   end
 
-  def extract_body(resp) do
-    resp.body
-    |> Jason.decode!()
-    |> Map.get("results",[])
-    |> List.first()
-    # IO.inspect("above: extract_results work so far")
-  end
-
-  def get_region_sandwich(region) do
-    statement = ["SELECT sandwich FROM sw WHERE pk = \"#{region}\""]
-    {:ok, somestuffback} = corro_request("query", statement)
-    somestuffback.results
-    |> Map.get("values",[])
-    |> List.first() # this may be unnecessarily clunky? idk!
-    |> List.first()
-    |> IO.inspect()
+  def init_region_sandwich(region) do
+    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES (\"#{region}\", \"empty\")"]
+    # IO.inspect(statement)
+    execute_corro(statement)
   end
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
@@ -49,13 +38,24 @@ defmodule Corrodemo.CorroCalls do
     end
   end
 
-  def init_region_sandwich(region) do
-    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES (\"#{region}\", \"empty\")"]
-    # IO.inspect(statement)
-    case corro_request("execute", statement) do
-      {:ok, somestuffback} -> inspect(somestuffback) |> Logger.debug()
-      {:error, reason} -> {:error, reason}
-    end
+  def get_region_sandwich(region) do
+    statement = ["SELECT sandwich FROM sw WHERE pk = \"#{region}\""]
+    {:ok, somestuffback} = corro_request("query", statement)
+    somestuffback.results
+    |> Map.get("values",[])
+    |> List.first() # this may be unnecessarily clunky? idk!
+    |> List.first()
+    |> IO.inspect()
+  end
+
+  defp extract_exec_results(body) do
+    results = body
+    |> Jason.decode!()
+    |> Map.get("results",[])
+    |> List.first()
+    |> IO.inspect()
+    {:ok, results}
+    # IO.inspect("above: extract_results work so far")
   end
 
   def get_sandwich_table() do

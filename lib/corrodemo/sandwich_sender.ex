@@ -16,12 +16,19 @@ defmodule Corrodemo.SandwichSender do
     region = System.get_env("FLY_REGION")
     IO.inspect("About to call init region sandwich #{region}")
     case Corrodemo.CorroCalls.init_region_sandwich(region) do
-      {:ok} 
-        -> IO.puts("Initialised region sandwich")
-        {:ok, %{}}
-      {:error, reason} 
+      {:ok, results}
+        -> case results do
+          %{"rows_affected" => rows_affected} ->
+            cond do
+              rows_affected == 0 -> IO.puts("No rows affected; sandwich already initialised")
+              rows_affected > 0 -> IO.puts("Initialised sandwich")
+            end
+            {:ok, []}
+          end
+      {:error, reason}
         -> IO.puts("Couldn't initialise region sandwich: #{reason}")
-        {:ok, %{}}
+        inspect(reason) |> Logger.debug()
+      {:ok, "Couldn't init region sandwich"}
     end
 
   end

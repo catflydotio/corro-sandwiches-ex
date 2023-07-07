@@ -2,9 +2,6 @@ defmodule Corrodemo.FriendFinder do
   use GenServer
   require Logger
 
-
-  # @name __MODULE__
-
   def start_link(_opts \\ []) do
     GenServer.start_link(Corrodemo.FriendFinder, [])
   end
@@ -65,15 +62,16 @@ defmodule Corrodemo.FriendFinder do
   def check_corrosion_regions() do
     corro_regions_resolver = ":inet_res.getbyname('regions.#{System.get_env("FLY_CORROSION_APP")}.internal', :txt)"
     # IO.puts corro_regions_resolver
-    {{:ok,  {_, _, _, _, _, region_list}}, []} = Code.eval_string(corro_regions_resolver)
-    #{{:ok, {:hostent, 'regions.ctestcorro.internal', [], :txt, 1, [['mad,yyz']]}}, []}
-    #{:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.ctestcorro.internal', :txt)
-    # {:hostent, 'regions.corrodemo.internal', [], :txt, 1, [['ewr,lax,yul,yyz']]}
-    regions = List.first(region_list)
-    |> List.to_string()
-    |> String.split(",")
-    |> IO.inspect(label: "corro regions")
-    {:ok, regions}
+    with {{:ok,  {_, _, _, _, _, region_list}}, []} <- Code.eval_string(corro_regions_resolver) do
+      #{{:ok, {:hostent, 'regions.ctestcorro.internal', [], :txt, 1, [['mad,yyz']]}}, []}
+      #{:ok,  {_, _, _, _, _, region_list}} = :inet_res.getbyname('regions.ctestcorro.internal', :txt)
+      # {:hostent, 'regions.corrodemo.internal', [], :txt, 1, [['ewr,lax,yul,yyz']]}
+      regions = List.first(region_list)
+      |> List.to_string()
+      |> String.split(",")
+      |> IO.inspect(label: "corro regions")
+      {:ok, regions}
+    end
   end
 
 end

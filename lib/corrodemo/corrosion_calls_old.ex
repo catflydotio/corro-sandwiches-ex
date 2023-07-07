@@ -13,7 +13,7 @@ defmodule Corrodemo.CorroCallsOld do
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
     corro_baseurl = System.get_env("CORRO_BASEURL")
-    cond do 
+    cond do
       String.length(corro_baseurl) > 0 ->
         corro_db_url = "#{corro_baseurl}/db/"
         # IO.inspect("About to inspect corro db url")
@@ -62,7 +62,7 @@ defmodule Corrodemo.CorroCallsOld do
     # IO.inspect(statement)
     case corro_request("execute", statement) do
       {:ok, somestuffback} -> inspect(somestuffback) |> Logger.debug()
-      {:ok} ->
+      {:ok} ->{:ok, []}
     end
   end
 
