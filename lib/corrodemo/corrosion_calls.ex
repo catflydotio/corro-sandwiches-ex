@@ -13,9 +13,26 @@ defmodule Corrodemo.CorroCalls do
 
   def execute_corro(statement) do
     with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("execute", statement),
-      {:ok, results} <- extract_exec_results(body) do
+      {:ok, results} <- extract_results(body) do
           {:ok, results}
     end
+  end
+
+  def query_corro(statement) do
+    with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("query", statement),
+      {:ok, results} <- extract_results(body) do
+          {:ok, results}
+    end
+  end
+
+  defp extract_results(body) do
+    results = body
+    |> Jason.decode!()
+    |> Map.get("results",[])
+    |> List.first()
+    |> IO.inspect()
+    {:ok, results}
+    # IO.inspect("above: extract_results work so far")
   end
 
   def init_region_sandwich(region) do
@@ -38,30 +55,23 @@ defmodule Corrodemo.CorroCalls do
 
   def get_region_sandwich(region) do
     statement = ["SELECT sandwich FROM sw WHERE pk = \"#{region}\""]
-    {:ok, somestuffback} = corro_request("query", statement)
-    somestuffback.results
-    |> Map.get("values",[])
-    |> List.first() # this may be unnecessarily clunky? idk!
-    |> List.first()
-    |> IO.inspect()
+    query_corro(statement)
   end
 
-  defp extract_exec_results(body) do
-    results = body
-    |> Jason.decode!()
-    |> Map.get("results",[])
-    |> List.first()
-    |> IO.inspect()
-    {:ok, results}
-    # IO.inspect("above: extract_results work so far")
-  end
+  # def extract_query_results(body) do
+  #   # this function may not work right but queries are going to change anyway...
+  #   results = body
+  #   |> Map.get("values",[])
+  #   |> List.first() # this may be unnecessarily clunky? idk!
+  #   |> List.first()
+  #   |> IO.inspect()
+  # end
 
   def get_sandwich_table() do
     statement = ["SELECT * FROM sw"]
     corro_request("query", statement)
     |> IO.inspect()
   end
-
 
 # def format_value(body) do
   # body |> IO.inspect()
