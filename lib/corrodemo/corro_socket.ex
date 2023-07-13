@@ -26,7 +26,8 @@ defmodule Corrodemo.CorroSockets do
 
   def subscribe_corro(0, opts) do
     IO.puts("Couldn't subscribe to corrosion.")
-    {:ok}
+    System.stop(0)
+    {:error, "Couldn't establish Corrosion websocket connection"}
   end
 
 
@@ -54,6 +55,7 @@ defmodule Corrodemo.CorroSockets do
   end
 
   def handle_frame({:binary, msg}, state) do
+    IO.puts("Handling a frame from Corrosion")
     # IO.inspect("Message from Corrosion: #{msg}")
     # IO.inspect(state)
     # This needs to handle SubscriptionMessage structs in response to changes
@@ -67,15 +69,9 @@ defmodule Corrodemo.CorroSockets do
     # IO.inspect("corro_sockets handle_frame inspection above")
     data = Map.get(event, "data",[])
     # could try all_in or whatever it was called instead of three Map.gets
-
-    sandwich = get_col(event, "sandwich")
-    # IO.inspect(sandwich)
-
     pk = get_pk(event, "pk")
-    # IO.inspect(pk)
-
-    # Once that's figured out, get it to send an assign update to the LiveView
-    # Broadcast over the "corro" pubsub topic
+    sandwich = get_col(event, "sandwich")
+    # Broadcast the new sandwich over the "fromcorro" pubsub topic for LiveView to pick up
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, %{region: pk, sandwich: sandwich}})
     # Websockex wants the end message to be like this:
     {:ok, data}

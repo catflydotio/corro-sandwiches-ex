@@ -1,10 +1,13 @@
 defmodule Corrodemo.CorroCalls do
+  import Corrodemo.FlyDnsReq
   require Logger
 
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
+    Corrodemo.FlyDnsReq.get_corro_instance()
     corro_db_url = "#{System.get_env("CORRO_BASEURL")}/db/"
     with {:ok, resp} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
+      # |> IO.inspect()
       |> Finch.request(Corrodemo.Finch) do
         {:ok, %{status_code: resp.status, body: resp.body, headers: resp.headers}}
         # {:error, resp} -> {:error, resp}
@@ -14,7 +17,7 @@ defmodule Corrodemo.CorroCalls do
   def execute_corro(statement) do
     with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("execute", statement),
       {:ok, results} <- extract_results(body) do
-          {:ok, results}
+        {:ok, results}
     end
   end
 
@@ -44,13 +47,8 @@ defmodule Corrodemo.CorroCalls do
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
     statement = ["UPDATE sw SET sandwich = \"#{sandwich}\" WHERE pk = \"#{region}\""]
+    IO.inspect(statement)
     execute_corro(statement)
-    # case corro_request("execute", statement) do
-    #   {:ok, somestuffback} -> {:ok, somestuffback}
-    #   IO.puts("Uploaded sandwich to corrosion")
-    #   {:error, somestuffback} -> inspect(somestuffback) |> Logger.debug()
-    # # {:error, %{reason: %Mint.TransportError{reason: :timeout}}}
-    # end
   end
 
   def get_region_sandwich(region) do

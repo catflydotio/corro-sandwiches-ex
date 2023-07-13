@@ -6,19 +6,24 @@ defmodule CorrodemoWeb.ShowOutputLive do
 
   def render(assigns) do
     ~H"""
-    <h2>This is the Sandwich Cloud in <%= @local_region %></h2>
+    <%= if System.get_env("FLY_APP_NAME") do %>
+    <h2>This is <%= System.get_env("FLY_APP_NAME") %> in <%= @local_region %></h2>
     <div>
       This app is also running in:
       <%= for reg <- @other_regions do %>
         <%= reg %>&nbsp;
       <% end %>
     </div>
+    <% end %>
     <%= unless System.get_env("CORRO_BUILTIN") == "1" do %>
       <div>
         The <%=System.get_env("FLY_CORROSION_APP")%> corrosion cluster is running in:
         <%= for reg <- @corro_regions do %>
           <%= reg %>&nbsp;
         <% end %>
+      </div>
+      <div>
+      top1.nearest.of.<%=System.get_env("FLY_CORROSION_APP")%> is Machine <%= @nearest_corrosion["instance"] %>, in <%= @nearest_corrosion["region"] %> at 6PN address <%= @nearest_corrosion["ip"] %>
       </div>
     <% end %>
     <div>
@@ -41,9 +46,10 @@ defmodule CorrodemoWeb.ShowOutputLive do
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "friend_regions")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corro_regions")
+    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "nearest_corrosion")
     # Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
     init_app_regions(socket)
-    {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: System.get_env("FLY_REGION"), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [])}
+    {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: System.get_env("FLY_REGION"), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [], nearest_corrosion: %{})}
     # , yyz: "blank", ewr: "blank", lax: "blank", yul: "blank"
   end
 
@@ -80,7 +86,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   # end
 
   def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
-    # IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
+    IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
     updated_kvs = Map.put(socket.assigns.kvs, region, sandwich)
     # thing = Code.eval_string(updated_kvs) # |> elem(0)
     # IO.inspect(updated_kvs)
@@ -95,6 +101,11 @@ defmodule CorrodemoWeb.ShowOutputLive do
   def handle_info({:corro_regions, corro_regions}, socket) do
     # IO.puts "LiveView getting corrosion region list from PubSub: #{other_regions}"
     {:noreply, assign(socket, :corro_regions, corro_regions)}
+  end
+
+  def handle_info({:nearest_corrosion, nearest_corrosion}, socket) do
+    # IO.puts "LiveView getting corrosion region list from PubSub: #{other_regions}"
+    {:noreply, assign(socket, :nearest_corrosion, nearest_corrosion)}
   end
 
   # This is inactive for now (see check_corro module). If activating,

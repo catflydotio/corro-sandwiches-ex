@@ -1,6 +1,7 @@
 defmodule Corrodemo.SandwichSender do
   use GenServer
   import Corrodemo.CorroCalls
+  import Corrodemo.FlyDnsReq
   require Logger
 
   # @name __MODULE__
@@ -26,7 +27,7 @@ defmodule Corrodemo.SandwichSender do
             {:ok, []}
           end
       {:error, reason}
-        -> IO.puts("Couldn't initialise region sandwich: #{reason}")
+        -> IO.puts("Couldn't initialise region sandwich!")
         inspect(reason) |> Logger.debug()
       {:ok, "Couldn't init region sandwich"}
     end
@@ -36,11 +37,26 @@ defmodule Corrodemo.SandwichSender do
   # Callbacks
 
   def handle_info({:sandwich, message}, state) do
-     #IO.puts("Sandwich sender received #{message} by PubSub")
+    #  IO.puts("Sandwich sender received #{message} by PubSub")
      fly_region = System.get_env("FLY_REGION")
+     Corrodemo.FlyDnsReq.get_all_instances()
       #IO.inspect(fly_region)
-      IO.inspect(message)
-     Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message)
+      #IO.inspect(message)
+     case Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message) do
+      {:ok, results}
+        -> case results do
+          %{"rows_affected" => rows_affected} ->
+            cond do
+              rows_affected == 0 -> IO.puts("No rows affected; no sandwich uploaded")
+              rows_affected > 0 -> #IO.puts("Successfully updated sandwich in Corrosion")
+            end
+            {:ok, []}
+          end
+      {:error, reason}
+        -> IO.puts("Couldn't upload region sandwich!")
+        inspect(reason) |> Logger.debug()
+        System.stop(0)
+    end
     {:noreply, state}
   end
 
