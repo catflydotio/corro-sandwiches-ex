@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export \
+CORRO_BASEURL=http://top1.nearest.of.ccorrosion.internal:8080 \
+FLY_CORROSION_APP="ccorrosion" \
+PHX_HOST="corrodemo.fly.dev" \
+FLY_APP_NAME="corrodemo" \
+FLY_REGION="mbp"
+
+env | grep corro
+echo FLY_APP_NAME=$FLY_APP_NAME
+echo FLY_REGION=$FLY_REGION
+
+iex -S mix phx.server
