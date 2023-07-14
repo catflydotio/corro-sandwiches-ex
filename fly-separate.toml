@@ -3,7 +3,7 @@
 # Use with a separate Corrosion V2 app; specify which one in the CORRO_BASEURL environment variable
 #
 
-app = "corro-sandwiches-ex"
+app = "corrodemo"
 primary_region = "yyz"
 kill_signal = "SIGTERM"
 
@@ -11,8 +11,8 @@ kill_signal = "SIGTERM"
   CORRO_BUILTIN = "0"
   FLY_CORROSION_APP = "ccorrosion"
   # CORRO_BASEURL = "http://localhost:8081"
-  # superseded by entrypoint script CORRO_BASEURL = "http://top1.nearest.of.ccorrosion.internal:8080"
-  # superseded by entrypoint script PHX_HOST = "corrodemo.fly.dev"
+  # superseded by entrypoint script: CORRO_BASEURL = "http://top1.nearest.of.ccorrosion.internal:8080"
+  # superseded by entrypoint script: PHX_HOST = "corrodemo.fly.dev"
   PORT = "8080"
 
 [http_service]

@@ -1,11 +1,16 @@
 #!/bin/bash
 
+this_fly_app="corro-sandwiches-ex"
+this_fly_app="corrodemo"
+fly_corrosion_app="ctestcorro"
+fly_corrosion_app="ccorrosion"
+
 export \
-CORRO_BASEURL=http://top1.nearest.of.ccorrosion.internal:8080 \
-FLY_CORROSION_APP="ccorrosion" \
-PHX_HOST="corrodemo.fly.dev" \
-FLY_APP_NAME="corrodemo" \
-FLY_REGION="mbp"
+CORRO_BASEURL=http://top1.nearest.of.$fly_corrosion_app.internal:8080 \
+FLY_CORROSION_APP="$fly_corrosion_app" \
+PHX_HOST="$this_fly_app.fly.dev" \
+FLY_APP_NAME="$this_fly_app" \
+FLY_REGION="local"
 
 env | grep corro
 echo FLY_APP_NAME=$FLY_APP_NAME

@@ -23,7 +23,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
         <% end %>
       </div>
       <div>
-      top1.nearest.of.<%=System.get_env("FLY_CORROSION_APP")%> is Machine <%= @nearest_corrosion["instance"] %>, in <%= @nearest_corrosion["region"] %> at 6PN address <%= @nearest_corrosion["ip"] %>
+      top1.nearest.of.<%=System.get_env("FLY_CORROSION_APP")%>.internal is Machine <%= @nearest_corrosion["instance"] %>, in <%= @nearest_corrosion["region"] %> at 6PN address <%= @nearest_corrosion["ip"] %>
       </div>
     <% end %>
     <div>
@@ -104,7 +104,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   end
 
   def handle_info({:nearest_corrosion, nearest_corrosion}, socket) do
-    # IO.puts "LiveView getting corrosion region list from PubSub: #{other_regions}"
+    # IO.puts "LiveView getting nearest corrosion info from PubSub."
     {:noreply, assign(socket, :nearest_corrosion, nearest_corrosion)}
   end
 

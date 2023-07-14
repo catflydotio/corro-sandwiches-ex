@@ -11,6 +11,9 @@ defmodule Corrodemo.SandwichSender do
     GenServer.start_link(Corrodemo.SandwichSender, [])
   end
 
+
+
+
   def init(_opts) do
     {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg topic")
@@ -29,12 +32,11 @@ defmodule Corrodemo.SandwichSender do
       {:error, reason}
         -> IO.puts("Couldn't initialise region sandwich!")
         inspect(reason) |> Logger.debug()
-      {:ok, "Couldn't init region sandwich"}
+        {:ok, "Couldn't init region sandwich"}
+      _ -> IO.puts("init_region_sandwich returned something I don't recognise")
     end
 
   end
-
-  # Callbacks
 
   def handle_info({:sandwich, message}, state) do
     #  IO.puts("Sandwich sender received #{message} by PubSub")
