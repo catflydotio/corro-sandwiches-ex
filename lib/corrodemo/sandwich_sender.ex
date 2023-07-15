@@ -4,20 +4,15 @@ defmodule Corrodemo.SandwichSender do
   import Corrodemo.FlyDnsReq
   require Logger
 
-  # @name __MODULE__
-
   def start_link(_opts \\ []) do
     # This is the function that gets run by the supervisor when I run the server
     GenServer.start_link(Corrodemo.SandwichSender, [])
   end
 
-
-
-
   def init(_opts) do
     {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg topic")
-    region = System.get_env("FLY_REGION")
+    region = Application.fetch_env!(:corrodemo, :fly_region)
     IO.inspect("About to call init region sandwich #{region}")
     case Corrodemo.CorroCalls.init_region_sandwich(region) do
       {:ok, results}
@@ -40,17 +35,19 @@ defmodule Corrodemo.SandwichSender do
 
   def handle_info({:sandwich, message}, state) do
     #  IO.puts("Sandwich sender received #{message} by PubSub")
-     fly_region = System.get_env("FLY_REGION")
+     fly_region = Application.fetch_env!(:corrodemo, :fly_region)
      Corrodemo.FlyDnsReq.get_all_instances()
       #IO.inspect(fly_region)
+      thing = Application.fetch_env!(:corrodemo, :testthis)
       #IO.inspect(message)
+      IO.inspect(thing, label: "testthis")
      case Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message) do
       {:ok, results}
         -> case results do
           %{"rows_affected" => rows_affected} ->
             cond do
               rows_affected == 0 -> IO.puts("No rows affected; no sandwich uploaded")
-              rows_affected > 0 -> #IO.puts("Successfully updated sandwich in Corrosion")
+              rows_affected > 0 -> IO.inspect("rows_affected: #{rows_affected}. Successfully updated sandwich in Corrosion")
             end
             {:ok, []}
           end

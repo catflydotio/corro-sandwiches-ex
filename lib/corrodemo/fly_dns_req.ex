@@ -32,7 +32,7 @@ defmodule Corrodemo.FlyDnsReq do
   end
 
   def get_corro_ipv6() do
-    dnsname = "'top1.nearest.of.#{System.get_env("FLY_CORROSION_APP")}.internal'"
+    dnsname = "'top1.nearest.of.#{Application.fetch_env!(:corrodemo, :fly_corrosion_app)}.internal'"
     get_aaaa_record(dnsname)
     |> extract_aaaa()
   end
@@ -45,12 +45,12 @@ defmodule Corrodemo.FlyDnsReq do
   end
 
   def dns_corro_vms() do
-    dnsname = "'vms.#{System.get_env("FLY_CORROSION_APP")}.internal'"
+    dnsname = "'vms.#{Application.fetch_env!(:corrodemo, :fly_corrosion_app)}.internal'"
     get_txt_record(dnsname)
   end
 
   def dns_corro_regions() do
-    dnsname = "'regions.#{System.get_env("FLY_CORROSION_APP")}.internal'"
+    dnsname = "'regions.#{Application.fetch_env!(:corrodemo, :fly_corrosion_app)}.internal'"
     get_txt_record(dnsname)
   end
 

@@ -6,8 +6,8 @@ defmodule CorrodemoWeb.ShowOutputLive do
 
   def render(assigns) do
     ~H"""
-    <%= if System.get_env("FLY_APP_NAME") do %>
-    <h2>This is <%= System.get_env("FLY_APP_NAME") %> in <%= @local_region %></h2>
+    <%= if Application.fetch_env!(:corrodemo, :fly_app_name) do %>
+    <h2>This is <%= Application.fetch_env!(:corrodemo, :fly_app_name) %> in <%= @local_region %></h2>
     <div>
       This app is also running in:
       <%= for reg <- @other_regions do %>
@@ -15,15 +15,15 @@ defmodule CorrodemoWeb.ShowOutputLive do
       <% end %>
     </div>
     <% end %>
-    <%= unless System.get_env("CORRO_BUILTIN") == "1" do %>
+    <%= unless Application.fetch_env!(:corrodemo, :corro_builtin)== "1" do %>
       <div>
-        The <%=System.get_env("FLY_CORROSION_APP")%> corrosion cluster is running in:
+        The <%=Application.fetch_env!(:corrodemo, :fly_corrosion_app)%> corrosion cluster is running in:
         <%= for reg <- @corro_regions do %>
           <%= reg %>&nbsp;
         <% end %>
       </div>
       <div>
-      top1.nearest.of.<%=System.get_env("FLY_CORROSION_APP")%>.internal is Machine <%= @nearest_corrosion["instance"] %>, in <%= @nearest_corrosion["region"] %> at 6PN address <%= @nearest_corrosion["ip"] %>
+      top1.nearest.of.<%=Application.fetch_env!(:corrodemo, :fly_corrosion_app)%>.internal is Machine <%= @nearest_corrosion["instance"] %>, in <%= @nearest_corrosion["region"] %> at 6PN address <%= @nearest_corrosion["ip"] %>
       </div>
     <% end %>
     <div>
@@ -49,7 +49,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "nearest_corrosion")
     # Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corrosion_ip")
     init_app_regions(socket)
-    {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: System.get_env("FLY_REGION"), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [], nearest_corrosion: %{})}
+    {:ok, assign(socket, thirteen_value: "nothing eh", pubsubmsg: "uninitialised", local_region: Application.fetch_env!(:corrodemo, :fly_region), local_corrosion_sandwich: "empty bread", kvs: %{}, sandwichmsg: "empty bread", corromsg: "blank", other_regions: [], corro_regions: [], nearest_corrosion: %{})}
     # , yyz: "blank", ewr: "blank", lax: "blank", yul: "blank"
   end
 

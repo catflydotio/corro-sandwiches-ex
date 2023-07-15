@@ -7,8 +7,8 @@ defmodule Corrodemo.CorroSockets do
   end
 
   def subscribe_corro(retries, opts) when retries > 0 do
-    subscribe_endpoint = "#{System.get_env("CORRO_BASEURL")}/v1/subscribe"
-    IO.inspect(subscribe_endpoint, label: "corro subscription endpoint")
+    subscribe_endpoint = "#{Application.fetch_env!(:corrodemo, :corro_baseurl)}/v1/subscribe"
+    # IO.inspect(subscribe_endpoint, label: "corro subscription endpoint")
     #inspect(opts) |> Logger.info()
     case WebSockex.start_link(subscribe_endpoint, __MODULE__, %{}, opts) do
       {:ok, pid} -> add_sub(pid)

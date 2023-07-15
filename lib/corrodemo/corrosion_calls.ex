@@ -5,7 +5,7 @@ defmodule Corrodemo.CorroCalls do
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
     Corrodemo.FlyDnsReq.get_corro_instance()
-    corro_db_url = "#{System.get_env("CORRO_BASEURL")}/v1/"
+    corro_db_url = "#{Application.fetch_env!(:corrodemo, :corro_baseurl)}/v1/"
     with {:ok, %Finch.Response{status: status_code, body: body, headers: headers}} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
       |> Finch.request(Corrodemo.Finch) do
         {:ok, %{status_code: status_code, body: body, headers: headers}}

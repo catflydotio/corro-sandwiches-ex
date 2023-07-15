@@ -16,7 +16,7 @@ defmodule Corrodemo.StartupChecks do
   end
 
   def check_corro_url() do
-      corro_baseurl = System.get_env("CORRO_BASEURL") |> IO.inspect()
+      corro_baseurl = Application.fetch_env!(:corrodemo, :corro_baseurl) |> IO.inspect(label: ":corro_baseurl env")
       cond do
         corro_baseurl -> {:ok, []}
               # {:error, resp} -> {:error, resp}
@@ -25,8 +25,8 @@ defmodule Corrodemo.StartupChecks do
   end
 
   def check_corro_app() do
-    unless System.get_env("CORRO_BUILTIN") == "1" do
-      corro_app = System.get_env("FLY_CORROSION_APP") |> IO.inspect()
+    unless Application.fetch_env!(:corrodemo, :corro_builtin) == "1" do
+      corro_app = Application.fetch_env!(:corrodemo, :fly_corrosion_app) |> IO.inspect()
       cond do
         corro_app -> {:ok, []}
               # {:error, resp} -> {:error, resp}
