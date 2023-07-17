@@ -23,13 +23,11 @@ end
 
 IO.puts("configuring corrodemo app vars in runtime.exs")
 config :corrodemo,
-  testthis: "a test var",
-  corro_baseurl: System.get_env("CORRO_BASEURL"),
   corro_builtin: System.get_env("CORRO_BUILTIN"),
   fly_corrosion_app: System.get_env("FLY_CORROSION_APP"),
+  corro_baseurl: System.get_env("CORRO_BASEURL") || "http://top1.nearest.of.#{System.get_env("FLY_CORROSION_APP")}.internal:8080",
   fly_region: System.get_env("FLY_REGION"),
   fly_app_name: System.get_env("FLY_APP_NAME")
-
 
 if config_env() == :prod do
   IO.puts("Configuring prod env")
@@ -45,7 +43,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || System.get_env("FLY_APP_NAME")<>".fly.dev"
   port = String.to_integer(System.get_env("PORT") || "4000")
   config :corrodemo, CorrodemoWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],

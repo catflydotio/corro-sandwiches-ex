@@ -1,6 +1,7 @@
 defmodule Corrodemo.StartupChecks do
   use GenServer
   require Logger
+  import Corrodemo.CorroWatch
 
   def start_link(_opts \\ []) do
     GenServer.start_link(__MODULE__, [])
@@ -11,6 +12,8 @@ defmodule Corrodemo.StartupChecks do
     with {:ok, []} <- check_corro_url(),
     {:ok, []} <- check_corro_app()
      do
+      IO.puts("About to start watch")
+      #Corrodemo.CorroWatch.start_watch("SELECT sandwich FROM sw WHERE pk='mad'")
       {:ok, []}
     end
   end

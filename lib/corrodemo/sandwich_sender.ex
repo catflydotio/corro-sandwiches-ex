@@ -38,9 +38,7 @@ defmodule Corrodemo.SandwichSender do
      fly_region = Application.fetch_env!(:corrodemo, :fly_region)
      Corrodemo.FlyDnsReq.get_all_instances()
       #IO.inspect(fly_region)
-      thing = Application.fetch_env!(:corrodemo, :testthis)
       #IO.inspect(message)
-      IO.inspect(thing, label: "testthis")
      case Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message) do
       {:ok, results}
         -> case results do
