@@ -1,18 +1,39 @@
 defmodule Corrodemo.CorroWatch do
   @moduledoc false
+  use GenServer
   require Logger
+
+  def start_link(_opts \\ []) do
+    # This is the function that gets run by the supervisor when I run the server
+    GenServer.start_link(Corrodemo.CorroWatch, [])
+  end
+
+  def init(opts) do
+    IO.puts("About to start watch")
+    Process.send(self(), :start_watcher, [])
+    IO.puts("Started watch")
+    {:ok, []}
+  end
+
+  def handle_info(:start_watcher, _opts) do
+    start_watch("select pk as region, sandwich from sw") #"SELECT sandwich FROM sw WHERE pk='mad'"
+    {:noreply, []}
+  end
 
   def start_watch(sql) do
     IO.inspect(sql, label: "In start_watch. sql is")
     path = "/v1/watches"
     json_sql = Jason.encode!(sql)
     stream(path, json_sql, %{}, fn
+      # :ok, :end_of_query, acc ->
+      #   {:ok, []}
       region, sandwich, :watched_sandwich_update, acc ->
         IO.inspect("New sandwich in #{region}: #{sandwich}")
         # do something with these and return the accumulator
         Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, %{region: region, sandwich: sandwich}})
         acc
     end)
+    {:ok, []}
   end
 
   def stream(path, json_sql, acc, caller_acc) do
@@ -39,6 +60,7 @@ defmodule Corrodemo.CorroWatch do
             |> case do
               %{"event" => "end_of_query"}
                 -> query_answered = true
+                # caller_acc.(:ok, :end_of_query, acc)
                 IO.puts("end of query")
               %{"data" => %{"cells" => [region, sandwich], "change_type" => change_type, "rowid" => rowid}}
                 -> caller_acc.(region, sandwich, :watched_sandwich_update, acc)

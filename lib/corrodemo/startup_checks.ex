@@ -12,8 +12,6 @@ defmodule Corrodemo.StartupChecks do
     with {:ok, []} <- check_corro_url(),
     {:ok, []} <- check_corro_app()
      do
-      IO.puts("About to start watch")
-      Corrodemo.CorroWatch.start_watch("select pk as region, sandwich from sw") #"SELECT sandwich FROM sw WHERE pk='mad'"
       {:ok, []}
     end
   end

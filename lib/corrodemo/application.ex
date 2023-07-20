@@ -20,6 +20,7 @@ defmodule Corrodemo.Application do
         }},
       # Start the Endpoint (http/https)
       Corrodemo.StartupChecks,
+      Corrodemo.CorroWatch,
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
       # {Corrodemo.Worker, arg}
