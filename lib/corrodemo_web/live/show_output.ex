@@ -78,8 +78,8 @@ defmodule CorrodemoWeb.ShowOutputLive do
   #   {:noreply, assign(socket, corromsg: message)}
   # end
 
-  # This sets the value of an existing assign with a region name. Trying to
-  # replace it with an assign
+  #This sets the value of an existing assign with a region name. Trying to
+  #replace it with an assign
   # def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
   #   IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
   #   {:noreply, assign(socket, String.to_atom(region), sandwich)}

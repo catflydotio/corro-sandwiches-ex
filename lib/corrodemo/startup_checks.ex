@@ -13,7 +13,7 @@ defmodule Corrodemo.StartupChecks do
     {:ok, []} <- check_corro_app()
      do
       IO.puts("About to start watch")
-      #Corrodemo.CorroWatch.start_watch("SELECT sandwich FROM sw WHERE pk='mad'")
+      Corrodemo.CorroWatch.start_watch("select pk as region, sandwich from sw") #"SELECT sandwich FROM sw WHERE pk='mad'"
       {:ok, []}
     end
   end
