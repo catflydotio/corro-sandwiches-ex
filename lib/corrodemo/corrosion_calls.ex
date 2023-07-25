@@ -23,17 +23,15 @@ defmodule Corrodemo.CorroCalls do
       # inspect(response) |> IO.inspect(label: "the response")
       # IO.inspect(Map.get(response, :status_code), label: "status_code")
       case response[:status_code] do
-        200 ->
-          # inspect(response[:body]) |> IO.inspect()
-          extract_results(response[:body])
+        200 -> extract_results(response[:body])
         404 -> IO.inspect("got a 404")
-        unexpected_response -> IO.inspect(unexpected_response, label: "in execute_corro else clause")
+        unexpected_response -> IO.inspect(unexpected_response, label: "got a non-200, non-404 error code")
       end
     end
   end
 
   def query_corro(statement) do
-    with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("query", statement),
+    with {:ok, %{body: body, headers: headers, status_code: 200}} <- corro_request("queries", statement),
       {:ok, results} <- extract_results(body) do
           {:ok, results}
     end
@@ -41,7 +39,6 @@ defmodule Corrodemo.CorroCalls do
 
   defp extract_results(body) do
     # %{body: "{\"results\":[{\"rows_affected\":0,\"time\":0.00008258}],\"time\":0.000364641}", headers: [{"content-type", "application/json"}, {"content-length", "70"}, {"date", "Fri, 14 Jul 2023 22:00:35 GMT"}], status_code: 200}
-    # IO.puts("inside extract_results")
     # IO.inspect(Jason.decode(body))
     with {:ok, %{"results" => [resultsmap],"time" => time}} <- Jason.decode(body) do
     {:ok, resultsmap}
@@ -50,31 +47,22 @@ defmodule Corrodemo.CorroCalls do
   end
 
   def init_region_sandwich(region) do
-    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES (\"#{region}\", \"empty\")"]
+    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{region}', 'empty')"]
     # IO.inspect(statement)
     execute_corro(statement)
   end
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
-    statement = ["UPDATE sw SET sandwich = \"#{sandwich}\" WHERE pk = \"#{region}\""]
+    statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{region}'"]
     IO.inspect(statement)
     execute_corro(statement)
   end
 
   def get_region_sandwich(region) do
-    statement = ["SELECT sandwich FROM sw WHERE pk = \"#{region}\""]
+    statement = ["SELECT sandwich FROM sw WHERE pk = '#{region}'"]
     query_corro(statement)
   end
-
-  # def extract_query_results(body) do
-  #   # this function may not work right but queries are going to change anyway...
-  #   results = body
-  #   |> Map.get("values",[])
-  #   |> List.first() # this may be unnecessarily clunky? idk!
-  #   |> List.first()
-  #   |> IO.inspect()
-  # end
 
   def get_sandwich_table() do
     statement = ["SELECT * FROM sw"]
@@ -82,14 +70,4 @@ defmodule Corrodemo.CorroCalls do
     |> IO.inspect()
   end
 
-# def format_value(body) do
-  # body |> IO.inspect()
-  # |> Jason.decode!()
-  # |> Map.get("results",[])
-  # |> List.first() # this may be unnecessarily clunky? idk!
-  # |> Map.get("values",[])
-  # |> List.first() # this may be unnecessarily clunky? idk!
-  # |> List.first() # this may be unnecessarily clunky? idk!
-  # |> IO.inspect()
-  # end
 end

@@ -9,7 +9,7 @@ kill_signal = "SIGTERM"
 
 [env]
   CORRO_BUILTIN = "0"
-  FLY_CORROSION_APP = "ccorrosion"
+  FLY_CORROSION_APP = "ctestcorro"
   # CORRO_BASEURL = "http://localhost:8081" # For all-in-one deployments
   # superseded by coro_baseurl in runtime.exs: CORRO_BASEURL = "http://top1.nearest.of.ccorrosion.internal:8080"
   # superseded by host in runtime.exs: PHX_HOST = "corrodemo.fly.dev"
