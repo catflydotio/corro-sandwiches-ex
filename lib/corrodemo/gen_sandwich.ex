@@ -12,7 +12,7 @@ defmodule Corrodemo.GenSandwich do
   end
 
   def init(_opts) do
-    :rand.seed(:exsplus, :erlang.now) # If I don't do this, all the VMs get the same set of sandwiches.
+    :rand.seed(:exsplus, :erlang.system_time) # If I don't do this, all the VMs get the same set of sandwiches.
     # I feel like they're still getting at least one sandwich the same every time.
     # I don't know anything about the algorithms for this, but it really doesn't matter in this app
     menu = Enum.take_random(@all_sandwiches, 3)
