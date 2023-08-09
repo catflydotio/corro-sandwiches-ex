@@ -20,12 +20,25 @@ if System.get_env("PHX_SERVER") do
   config :corrodemo, CorrodemoWeb.Endpoint, server: true
 end
 
-
 IO.puts("configuring corrodemo app vars in runtime.exs")
+
+if System.get_env("CORRO_BUILTIN") == "1" do
+  IO.puts("Setting fly_corrosion_app to "<>System.get_env("FLY_APP_NAME"))
+  IO.puts("Setting corro_baseurl to "<>"http://localhost:8081")
+  config :corrodemo,
+    fly_corrosion_app: System.get_env("FLY_APP_NAME"),
+    corro_baseurl: "http://localhost:8081"
+else
+  IO.puts("Setting fly_corrosion_app to "<>System.get_env("FLY_CORROSION_APP"))
+  IO.puts("Setting corro_baseurl to "<>"http://top1.nearest.of.#{System.get_env("FLY_CORROSION_APP")}.internal:8081")
+
+  config :corrodemo,
+    fly_corrosion_app: System.get_env("FLY_CORROSION_APP"),
+    corro_baseurl: "http://top1.nearest.of.#{System.get_env("FLY_CORROSION_APP")}.internal:8080"
+end
+
 config :corrodemo,
   corro_builtin: System.get_env("CORRO_BUILTIN"),
-  fly_corrosion_app: System.get_env("FLY_CORROSION_APP"),
-  corro_baseurl: System.get_env("CORRO_BASEURL") || "http://top1.nearest.of.#{System.get_env("FLY_CORROSION_APP")}.internal:8080",
   fly_region: System.get_env("FLY_REGION"),
   fly_app_name: System.get_env("FLY_APP_NAME")
 

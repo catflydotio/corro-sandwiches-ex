@@ -40,7 +40,7 @@ defmodule Corrodemo.FlyDnsReq do
   def get_corro_instance() do
     ip = get_corro_ipv6()
     everything = get_all_instances()
-    IO.inspect("Closest corrosion is #{everything[ip]["instance"]} in #{everything[ip]["region"]} at #{ip}")
+    # IO.inspect("Closest corrosion is #{everything[ip]["instance"]} in #{everything[ip]["region"]} at #{ip}")
     everything[ip]
   end
 

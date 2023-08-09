@@ -86,7 +86,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   # end
 
   def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
-    IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
+    # IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
     updated_kvs = Map.put(socket.assigns.kvs, region, sandwich)
     # thing = Code.eval_string(updated_kvs) # |> elem(0)
     # IO.inspect(updated_kvs)

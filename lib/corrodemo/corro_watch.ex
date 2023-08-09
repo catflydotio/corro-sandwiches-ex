@@ -39,7 +39,8 @@ defmodule Corrodemo.CorroWatch do
       %{"event" => "end_of_query"}
         -> IO.puts("end of query")
       %{"data" => %{"cells" => [region, sandwich], "change_type" => _change_type, "rowid" => _rowid}}
-        -> IO.inspect("New sandwich in #{region}: #{sandwich}")
+        ->
+        # IO.inspect("New sandwich in #{region}: #{sandwich}")
         Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, %{region: region, sandwich: sandwich}})
       # At this point in the possibilities, if "data" is a list, Corrosion is telling us
       # if the ids are rows or columns
@@ -84,7 +85,7 @@ defmodule Corrodemo.CorroWatch do
           # |> IO.inspect(label: "split string")
           |> Enum.each(fn str ->
             Jason.decode!(str)
-            |> IO.inspect(label: "stuff")
+            # |> IO.inspect(label: "stuff")
             |> caller_acc.(:resp_data, acc)
           end)
           response
@@ -108,6 +109,7 @@ defmodule Corrodemo.CorroWatch do
   """
   defp url(path) do
     base = Application.fetch_env!(:corrodemo, :corro_baseurl)
+    IO.inspect(Path.join(base, path), label: "corrosion watch url")
     Path.join(base, path)
   end
 

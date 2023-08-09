@@ -1,9 +1,11 @@
-# These versions were picked by flyctl in June 2023
-ARG ELIXIR_VERSION=1.14.5
-ARG OTP_VERSION=25.3.2
-ARG DEBIAN_VERSION=bullseye-20230522-slim
+# I updated to these versions Aug 8 2023 to catch up to GLIBC needed by latest 
+# Corrosion binary from Jerome
+ARG ELIXIR_VERSION=1.15.4
+ARG OTP_VERSION=25.3.2.5
+ARG DEBIAN_VERSION=bookworm-20230612-slim
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+# ARG BUILDER_IMAGE="1.15.4-erlang-25.3.2.5-debian-bookworm-20230612-slim"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
 
@@ -103,7 +105,7 @@ COPY /entrypoint.sh /entrypoint
 COPY --chown=corrosion:corrosion --chmod=0755 corrosion.toml /app/corrosion.toml
 COPY --chown=corrosion:corrosion --chmod=0755 schemas /app/schemas
 # Get compiled binary
-COPY --chown=corrosion:corrosion --chmod=0755 corrosion /app/corrosion
+COPY --chown=corrosion:corrosion --chmod=0755 corrosion2 /app/corrosion
 
 #COPY --from=builder --chown=corrosion:corrosion --chmod=0755 /app/overmind-v2.4.0-linux-amd64 /app/overmind
 COPY --chmod=0755 overmind-v2.4.0-linux-amd64 /app/overmind

@@ -55,7 +55,7 @@ defmodule Corrodemo.CorroCalls do
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
     statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{region}'"]
-    IO.inspect(statement)
+    # IO.inspect(statement)
     execute_corro(statement)
   end
 

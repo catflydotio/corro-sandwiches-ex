@@ -45,7 +45,7 @@ defmodule Corrodemo.SandwichSender do
           %{"rows_affected" => rows_affected} ->
             cond do
               rows_affected == 0 -> IO.puts("No rows affected; no sandwich uploaded")
-              rows_affected > 0 -> IO.inspect("rows_affected: #{rows_affected}. Successfully updated sandwich in Corrosion")
+              rows_affected > 0 -> # IO.inspect("rows_affected: #{rows_affected}. Successfully updated sandwich in Corrosion")
             end
             {:ok, []}
           end

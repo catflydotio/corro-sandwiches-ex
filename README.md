@@ -13,7 +13,7 @@ iex mix phx.server
 fly apps create
 put the new app name into fly.toml so you don't have to keep using -a
 fly secrets set SECRET_KEY_BASE=$(mix phx.gen.secret 64)
-fly volumes create corro_data -y -s 1
+fly volumes create corro_data -y -s 1 (can skip this; fly deploy will do it)
 fly ips allocate-v4 --shared
 fly ips allocate-v6
 <!-- If using a separate app running on Fly.io for corrosion -->
