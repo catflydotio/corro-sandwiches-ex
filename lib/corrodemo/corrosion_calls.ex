@@ -41,9 +41,9 @@ defmodule Corrodemo.CorroCalls do
     # %{body: "{\"results\":[{\"rows_affected\":0,\"time\":0.00008258}],\"time\":0.000364641}", headers: [{"content-type", "application/json"}, {"content-length", "70"}, {"date", "Fri, 14 Jul 2023 22:00:35 GMT"}], status_code: 200}
     # IO.inspect(Jason.decode(body))
     with {:ok, %{"results" => [resultsmap],"time" => time}} <- Jason.decode(body) do
+    inspect(resultsmap) |> IO.inspect(lanel: "in corrosion calls. resultsmap")
     {:ok, resultsmap}
     end
-    # IO.inspect("above: extract_results work so far")
   end
 
   def init_region_sandwich(region) do

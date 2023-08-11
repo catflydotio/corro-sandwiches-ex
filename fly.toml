@@ -4,7 +4,7 @@
 #
 
 app = "sandwich-builtin"
-primary_region = "yyz"
+primary_region = "ewr"
 kill_signal = "SIGTERM"
 
 [mounts]
@@ -16,9 +16,6 @@ destination = "/var/lib/corrosion"
 
 [env]
   CORRO_BUILTIN = "1"
-  # CORRO_BASEURL = "http://localhost:8081"
-  # FLY_CORROSION_APP = "ctestcorro"
-# CORRO_BASEURL = "http://top1.nearest.of.ctestcorro.internal:8080"
   # superseded by host in runtime.exs PHX_HOST = "sandwich-builtin.fly.dev"
   PORT = "8080"
   RUST_BACKTRACE = "1"

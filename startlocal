@@ -10,10 +10,10 @@ CORRO_BASEURL=http://top1.nearest.of.$fly_corrosion_app.internal:8080 \
 FLY_CORROSION_APP="$fly_corrosion_app" \
 PHX_HOST="$this_fly_app.fly.dev" \
 FLY_APP_NAME="$this_fly_app" \
-FLY_REGION="local"
+FLY_MACHINE_ID="local"
 
 env | grep corro
 echo FLY_APP_NAME=$FLY_APP_NAME
-echo FLY_REGION=$FLY_REGION
+echo FLY_MACHINE_ID=$FLY_MACHINE_ID
 
 iex -S mix phx.server

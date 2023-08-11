@@ -1,5 +1,8 @@
 defmodule Corrodemo.CorroWatch do
-  @moduledoc false
+  @moduledoc """
+  Corrosion watches/subscriptions
+  """
+
   use GenServer
   require Logger
 
@@ -10,14 +13,19 @@ defmodule Corrodemo.CorroWatch do
 
   def init(_opts) do
     Process.send(self(), {:start_watcher,"select pk as region, sandwich from sw"}, [])
-    IO.puts("Started watch")
     {:ok, []}
   end
 
   def handle_info({:start_watcher, statement}, _opts) do
     do_watch(statement) #"SELECT sandwich FROM sw WHERE pk='mad'"
+    IO.puts("Started watch")
     {:noreply, []}
   end
+
+  # def handle_call(:set_watch_id, state) do
+  #   {:reply, }
+
+  # end
 
   def do_watch(sql) do
     IO.inspect(sql, label: "In do_watch. sql is")
@@ -63,7 +71,6 @@ defmodule Corrodemo.CorroWatch do
         which uses finch_acc as its stream/1 accumulator function
           which is what passes stuff to the function passed as its
           caller_acc argument to do something with
-
   """
   def stream(path, json_sql, acc, caller_acc) do
     # this function has to take the following options because it's being used as the
@@ -75,10 +82,10 @@ defmodule Corrodemo.CorroWatch do
           %Req.Response{response | status: status}
         {:headers, headers}, response ->
           # IO.inspect(response, label: "response")
-          # IO.inspect(headers, label: "headers")
+          IO.inspect(headers, label: "headers")
           %Req.Response{response | headers: headers}
         {:data, data}, response ->
-          # IO.inspect(response, label: "response")
+          IO.inspect(response, label: "response")
           # IO.inspect(data, label: "data")
           data
           |> String.split("\n", trim: true)
@@ -97,11 +104,14 @@ defmodule Corrodemo.CorroWatch do
       case Finch.stream(finch_req, finch_name, Req.Response.new(), finch_acc, [finch_opts, receive_timeout: :infinity]) do
         {:ok, response} -> IO.inspect(response, label: "Finch.stream got an {:ok, response} tuple. response:")
           {request, response}
-        {:error, exception} -> {request, exception}
+        {:error, exception} -> inspect(exception)
+        |> IO.inspect(label: "Finch.stream got an exception")
+          {request, exception}
       end
     end
 
-    Req.post!(url(path), headers: [{"content-type", "application/json"}], body: json_sql, connect_options: [transport_opts: [inet6: true]], finch_request: finch_fun)
+    post_stream_req(path, finch_fun, json_sql)
+
   end
 
   @doc """
@@ -112,5 +122,18 @@ defmodule Corrodemo.CorroWatch do
     IO.inspect(Path.join(base, path), label: "corrosion watch url")
     Path.join(base, path)
   end
+
+  @doc """
+  Make the Req streaming request
+  """
+  def post_stream_req(path, finch_fun, json_sql) do
+    Req.post!(url(path), headers: [{"content-type", "application/json"}], body: json_sql, connect_options: [transport_opts: [inet6: true]], finch_request: finch_fun)
+  end
+
+  # @doc """
+  # Cast the watch id
+  # """
+  # def set_watch_id()
+
 
 end
