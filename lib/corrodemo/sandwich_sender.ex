@@ -14,7 +14,7 @@ defmodule Corrodemo.SandwichSender do
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg topic")
     region = Application.fetch_env!(:corrodemo, :fly_region)
     IO.inspect("About to call init region sandwich #{region}")
-    case Corrodemo.CorroCalls.init_region_sandwich(region) do
+    case init_region_sandwich(region) do
       {:ok, results}
         -> case results do
           %{"rows_affected" => rows_affected} ->
@@ -41,7 +41,7 @@ defmodule Corrodemo.SandwichSender do
      Corrodemo.FlyDnsReq.get_all_instances()
       #IO.inspect(fly_region)
       #IO.inspect(message)
-     case Corrodemo.CorroCalls.upload_region_sandwich(fly_region, message) do
+     case upload_region_sandwich(fly_region, message) do
       {:ok, results}
         -> case results do
           %{"rows_affected" => rows_affected} ->
@@ -63,5 +63,34 @@ defmodule Corrodemo.SandwichSender do
     IO.puts("Sandwich sender received some other message #{message}")
     {:noreply, state}
   end
+
+  def init_region_sandwich(region) do
+    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{region}', 'empty')"]
+    # IO.inspect(statement)
+    Corrodemo.CorroCalls.execute_corro(statement)
+  end
+
+  # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
+  def upload_region_sandwich(region, sandwich) do
+    statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{region}'"]
+    # IO.inspect(statement)
+    Corrodemo.CorroCalls.execute_corro(statement)
+  end
+
+  def get_region_sandwich(region) do
+    statement = ["SELECT sandwich FROM sw WHERE pk = '#{region}'"]
+    Corrodemo.CorroCalls.query_corro(statement)
+  end
+
+  @doc """
+  This isn't used
+  """
+  def get_sandwich_table() do
+    statement = ["SELECT * FROM sw"]
+    Corrodemo.CorroCalls.corro_request("query", statement)
+    |> IO.inspect()
+  end
+
+
 
 end

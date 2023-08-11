@@ -56,7 +56,7 @@ defmodule Corrodemo.CorroWatch do
   end
 
   @doc """
-  Function to run Req.post!/2 with a streaming function in place
+  Runs Req.post!/2 with a streaming function in place
   of the default request/response one for the :finch_request option.
 
   https://hexdocs.pm/req/Req.Steps.html#run_finch/1-request-options
@@ -120,7 +120,7 @@ defmodule Corrodemo.CorroWatch do
   end
 
   @doc """
-  Make the Req streaming request
+  Use Req to make a Finch.stream request.
   """
   def post_stream_req(path, finch_fun, json_sql) do
     Req.post!(url(path), headers: [{"content-type", "application/json"}], body: json_sql, connect_options: [transport_opts: [inet6: true]], finch_request: finch_fun)

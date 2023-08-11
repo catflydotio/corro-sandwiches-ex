@@ -16,7 +16,6 @@ defmodule Corrodemo.CorroCalls do
     end
   end
 
-
   def execute_corro(statement) do
     with {:ok, response} <- corro_request("transactions", statement) do
       # IO.puts("got an ok, response from corro_request")
@@ -44,33 +43,6 @@ defmodule Corrodemo.CorroCalls do
     inspect(resultsmap) |> IO.inspect(lanel: "in corrosion calls. resultsmap")
     {:ok, resultsmap}
     end
-  end
-
-  def init_region_sandwich(region) do
-    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{region}', 'empty')"]
-    # IO.inspect(statement)
-    execute_corro(statement)
-  end
-
-  # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
-  def upload_region_sandwich(region, sandwich) do
-    statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{region}'"]
-    # IO.inspect(statement)
-    execute_corro(statement)
-  end
-
-  def get_region_sandwich(region) do
-    statement = ["SELECT sandwich FROM sw WHERE pk = '#{region}'"]
-    query_corro(statement)
-  end
-
-  @doc """
-  This isn't used
-  """
-  def get_sandwich_table() do
-    statement = ["SELECT * FROM sw"]
-    corro_request("query", statement)
-    |> IO.inspect()
   end
 
   def start_watch(statement) do
