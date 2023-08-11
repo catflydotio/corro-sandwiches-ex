@@ -22,13 +22,8 @@ defmodule Corrodemo.CorroWatch do
   def handle_info({:start_watcher, statement}, _opts) do
     do_watch(statement) #"SELECT sandwich FROM sw WHERE pk='mad'"
     IO.puts("Started watch")
-    {:noreply, []}
+    {:noreply, statement}
   end
-
-  # def handle_call(:set_watch_id, state) do
-  #   {:reply, }
-
-  # end
 
   def do_watch(sql) do
     IO.inspect(sql, label: "In do_watch. sql is")
@@ -49,12 +44,10 @@ defmodule Corrodemo.CorroWatch do
     |> case do
       %{"event" => "end_of_query"}
         -> IO.puts("end of query")
-      %{"data" => %{"cells" => [region, sandwich], "change_type" => _change_type, "rowid" => _rowid}}
-        ->
-        # IO.inspect("New sandwich in #{region}: #{sandwich}")
-        Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, %{region: region, sandwich: sandwich}})
+      %{"data" => %{"cells" => [head | tail], "change_type" => _change_type, "rowid" => _rowid}}
+        -> Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, [head | tail]})
       # At this point in the possibilities, if "data" is a list, Corrosion is telling us
-      # if the ids are rows or columns
+      # if the ids are rows or columns:
       %{"data" => [head | tail], "event" => id_kind}
         -> IO.inspect("Watching changes in #{id_kind}: #{[head | tail]}") # could write this list nicely
       :ok -> IO.puts("got :ok from finch_acc")
@@ -132,7 +125,4 @@ defmodule Corrodemo.CorroWatch do
   def post_stream_req(path, finch_fun, json_sql) do
     Req.post!(url(path), headers: [{"content-type", "application/json"}], body: json_sql, connect_options: [transport_opts: [inet6: true]], finch_request: finch_fun)
   end
-
-
-
 end

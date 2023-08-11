@@ -85,7 +85,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
   #   {:noreply, assign(socket, String.to_atom(region), sandwich)}
   # end
 
-  def handle_info({:fromcorro, %{region: region, sandwich: sandwich}}, socket) do
+  def handle_info({:fromcorro, [region, sandwich]}, socket) do
     # IO.puts "LiveView getting a sandwich from corrosion: #{region}, #{sandwich}"
     updated_kvs = Map.put(socket.assigns.kvs, region, sandwich)
     # thing = Code.eval_string(updated_kvs) # |> elem(0)
