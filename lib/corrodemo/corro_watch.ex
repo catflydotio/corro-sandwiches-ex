@@ -1,19 +1,22 @@
 defmodule Corrodemo.CorroWatch do
   @moduledoc """
-  Corrosion watches/subscriptions
+  Watch/subscribe to changes in the results of a given query.
+
+  This module gets started as a child of the dynamic supervisor
+  Corrodemo.WatchSupervisor.
   """
 
   use GenServer
   require Logger
 
-  def start_link(_opts \\ []) do
+  def start_link(statement) do
     # This is the function that gets run by the supervisor when I run the server
-    GenServer.start_link(Corrodemo.CorroWatch, [])
+    GenServer.start_link(Corrodemo.CorroWatch, statement)
   end
 
-  def init(_opts) do
-    Process.send(self(), {:start_watcher,"select pk as region, sandwich from sw"}, [])
-    {:ok, []}
+  def init(statement) do
+    Process.send(self(), {:start_watcher, statement}, [])
+    {:ok, statement}
   end
 
   def handle_info({:start_watcher, statement}, _opts) do
@@ -130,10 +133,6 @@ defmodule Corrodemo.CorroWatch do
     Req.post!(url(path), headers: [{"content-type", "application/json"}], body: json_sql, connect_options: [transport_opts: [inet6: true]], finch_request: finch_fun)
   end
 
-  # @doc """
-  # Cast the watch id
-  # """
-  # def set_watch_id()
 
 
 end
