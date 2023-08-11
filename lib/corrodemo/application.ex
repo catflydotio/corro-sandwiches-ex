@@ -19,7 +19,6 @@ defmodule Corrodemo.Application do
             default: [conn_opts: [transport_opts: [inet6: true]]]
         }},
       # Start the Endpoint (http/https)
-      Corrodemo.StartupChecks,
       {DynamicSupervisor, name: Corrodemo.WatchSupervisor, strategy: :one_for_one},
       # Corrodemo.CorroWatch,
       CorrodemoWeb.Endpoint,

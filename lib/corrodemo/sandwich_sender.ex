@@ -10,8 +10,9 @@ defmodule Corrodemo.SandwichSender do
   end
 
   def init(_opts) do
+    Corrodemo.StartupChecks.do_corro_checks()
     {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}
-    |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg topic")
+    |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg PubSub topic")
     region = Application.fetch_env!(:corrodemo, :fly_region)
     IO.inspect("About to call init region sandwich #{region}")
     case init_region_sandwich(region) do

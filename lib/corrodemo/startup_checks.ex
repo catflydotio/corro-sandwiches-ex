@@ -1,11 +1,6 @@
 defmodule Corrodemo.StartupChecks do
-  use GenServer
 
-  def start_link(_opts \\ []) do
-    GenServer.start_link(__MODULE__, [])
-  end
-
-  def init(_opts) do
+  def do_corro_checks() do
     with {:ok, []} <- check_corro_url(),
     {:ok, []} <- check_corro_app()
     do
