@@ -36,7 +36,6 @@ defmodule Corrodemo.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Corrodemo.Supervisor]
     Supervisor.start_link(children, opts)
-    DynamicSupervisor.start_child(Corrodemo.WatchSupervisor, {Corrodemo.CorroWatch,"select pk as region, sandwich from sw"})
   end
 
   # Tell Phoenix to update the endpoint configuration

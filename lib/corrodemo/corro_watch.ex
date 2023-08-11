@@ -3,7 +3,8 @@ defmodule Corrodemo.CorroWatch do
   Watch/subscribe to changes in the results of a given query.
 
   This module gets started as a child of the dynamic supervisor
-  Corrodemo.WatchSupervisor.
+  Corrodemo.WatchSupervisor. The idea is that you might want to
+  start more than one copy of this for separate watch queries.
   """
 
   use GenServer
@@ -39,7 +40,6 @@ defmodule Corrodemo.CorroWatch do
   end
 
   def watch_actions(resp_data) do
-    # could still factor out some general corrosion stuff from specific sandwich stuff
     resp_data
     |> case do
       %{"event" => "end_of_query"}
@@ -78,7 +78,7 @@ defmodule Corrodemo.CorroWatch do
           %Req.Response{response | status: status}
         {:headers, headers}, response ->
           # IO.inspect(response, label: "response")
-          IO.inspect(headers, label: "headers")
+          # IO.inspect(headers, label: "headers")
           %Req.Response{response | headers: headers}
         {:data, data}, response ->
           IO.inspect(response, label: "response")

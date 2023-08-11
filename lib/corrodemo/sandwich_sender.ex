@@ -30,7 +30,9 @@ defmodule Corrodemo.SandwichSender do
         {:ok, "Couldn't init region sandwich"}
       _ -> IO.puts("init_region_sandwich returned something I don't recognise")
     end
-
+    IO.inspect("About to start a watch")
+    Corrodemo.CorroCalls.start_watch("select pk as region, sandwich from sw")
+    {:ok, []}
   end
 
   def handle_info({:sandwich, message}, state) do

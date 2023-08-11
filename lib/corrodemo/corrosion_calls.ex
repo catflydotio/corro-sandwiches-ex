@@ -64,10 +64,17 @@ defmodule Corrodemo.CorroCalls do
     query_corro(statement)
   end
 
+  @doc """
+  This isn't used
+  """
   def get_sandwich_table() do
     statement = ["SELECT * FROM sw"]
     corro_request("query", statement)
     |> IO.inspect()
+  end
+
+  def start_watch(statement) do
+    DynamicSupervisor.start_child(Corrodemo.WatchSupervisor, {Corrodemo.CorroWatch,statement})
   end
 
 end
