@@ -20,7 +20,8 @@ defmodule Corrodemo.Application do
         }},
       # Start the Endpoint (http/https)
       Corrodemo.StartupChecks,
-      Corrodemo.CorroWatch,
+      {DynamicSupervisor, name: Corrodemo.WatchSupervisor, strategy: :one_for_one},
+      # Corrodemo.CorroWatch,
       CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
       # {Corrodemo.Worker, arg}
@@ -35,6 +36,7 @@ defmodule Corrodemo.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Corrodemo.Supervisor]
     Supervisor.start_link(children, opts)
+    DynamicSupervisor.start_child(Corrodemo.WatchSupervisor, {Corrodemo.CorroWatch,[]})
   end
 
   # Tell Phoenix to update the endpoint configuration
