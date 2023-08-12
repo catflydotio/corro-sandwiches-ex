@@ -16,15 +16,12 @@ defmodule Corrodemo.GenSandwich do
     # I feel like they're still getting at least one sandwich the same every time.
     # I don't know anything about the algorithms for this, but it really doesn't matter in this app
     menu = Enum.take_random(@all_sandwiches, 3)
-    IO.inspect "In #{Application.fetch_env!(:corrodemo, :fly_region)}, the sandwich menu is #{menu}."
+    IO.inspect "On Machine #{Application.fetch_env!(:corrodemo, :fly_vm_id)}, the sandwich menu is #{menu}."
     do_the_swap(menu)
     {:ok, []}
   end
 
   def handle_info({:do_the_swap, menu}, _state) do
-    # region = String.to_atom(Application.fetch_env!(:corrodemo, :fly_region))
-    # #IO.inspect{"Checking region: #{region}"}
-    # #result = Enum.random(@sandwiches[region]) # this was to pick a sandwich from a hardcoded list
     sandwich = Enum.random(menu)
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "sandwichmsg", {:sandwich, sandwich})
     # get_sandwich()

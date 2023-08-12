@@ -37,16 +37,17 @@ defmodule Corrodemo.FriendFinder do
   def check_regions() do
     home_region = Application.fetch_env!(:corrodemo, :fly_region)
     this_app = Application.fetch_env!(:corrodemo, :fly_app_name)
-    # IO.inspect("FLY_APP_NAME is #{this_app}")
+    IO.inspect("FLY_APP_NAME is #{this_app}")
+    IO.inspect("fly_region is #{home_region}")
     app_regions_resolver = ":inet_res.getbyname('regions.#{this_app}.internal', :txt)"
     case Code.eval_string(app_regions_resolver) do
       {{:ok,  {_, _, _, _, _, region_list}},[]} -> other_regions = List.first(region_list)
-      |> List.to_string()
-      |> String.split(",")
-      # |> IO.inspect(label: "app regions")
-      |> Enum.reject(& match?(^home_region, &1))
-      #|> IO.inspect(label: "other regions")
-      {:ok, other_regions}
+        |> List.to_string()
+        |> String.split(",")
+        |> IO.inspect(label: "app regions")
+        |> Enum.reject(& match?(^home_region, &1))
+        #|> IO.inspect(label: "other regions")
+        {:ok, other_regions}
       {:ok} -> {:ok, []}
       {{:error, :nxdomain},[]} -> {:error, :nxdomain}
     end

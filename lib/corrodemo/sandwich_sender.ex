@@ -13,21 +13,19 @@ defmodule Corrodemo.SandwichSender do
     Corrodemo.StartupChecks.do_corro_checks()
     {Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")}
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg PubSub topic")
-    region = Application.fetch_env!(:corrodemo, :fly_region)
-    IO.inspect("About to call init region sandwich #{region}")
-    init_region_sandwich(region)
+    vm = Application.fetch_env!(:corrodemo, :fly_vm_id)
+    IO.inspect("About to call init local sandwich #{vm}")
+    init_local_sandwich(vm)
     IO.inspect("About to start a watch")
-    Corrodemo.CorroCalls.start_watch("select pk as region, sandwich from sw")
+    Corrodemo.CorroCalls.start_watch("SELECT pk AS vm_id, sandwich FROM sw")
     {:ok, []}
   end
 
   def handle_info({:sandwich, message}, state) do
     #  IO.puts("Sandwich sender received #{message} by PubSub")
-    fly_region = Application.fetch_env!(:corrodemo, :fly_region)
+    vm = Application.fetch_env!(:corrodemo, :fly_vm_id)
     Corrodemo.FlyDnsReq.get_all_instances()
-    #IO.inspect(fly_region)
-    #IO.inspect(message)
-    upload_region_sandwich(fly_region, message)
+    upload_local_sandwich(vm, message)
     {:noreply, state}
   end
 
@@ -36,8 +34,8 @@ defmodule Corrodemo.SandwichSender do
     {:noreply, state}
   end
 
-  def init_region_sandwich(region) do
-    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{region}', 'empty')"]
+  def init_local_sandwich(vm_id) do
+    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{vm_id}', 'empty')"]
     # IO.inspect(statement)
     case Corrodemo.CorroCalls.execute_corro(statement) do
     {:ok, results}
@@ -50,16 +48,16 @@ defmodule Corrodemo.SandwichSender do
               {:ok, []}
           end
       {:error, reason}
-        -> IO.puts("Couldn't initialise region sandwich!")
+        -> IO.puts("Couldn't initialise local sandwich!")
         inspect(reason) |> Logger.debug()
-        {:ok, "Couldn't init region sandwich"}
-      _ -> IO.puts("init_region_sandwich returned something I don't recognise")
+        {:ok, "Couldn't init local sandwich"}
+      _ -> IO.puts("init_local_sandwich returned something I don't recognise")
     end
   end
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
-  def upload_region_sandwich(region, sandwich) do
-    statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{region}'"]
+  def upload_local_sandwich(vm_id, sandwich) do
+    statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{vm_id}'"]
     # IO.inspect(statement)
     case Corrodemo.CorroCalls.execute_corro(statement) do
     {:ok, results}
@@ -72,19 +70,23 @@ defmodule Corrodemo.SandwichSender do
             {:ok, []}
           end
     {:error, reason}
-      -> IO.puts("Couldn't upload region sandwich!")
+      -> IO.puts("Couldn't upload local sandwich!")
       inspect(reason) |> Logger.debug()
       System.stop(0)
     end
   end
 
-  def get_region_sandwich(region) do
-    statement = ["SELECT sandwich FROM sw WHERE pk = '#{region}'"]
+
+  @doc """
+  This isn't used or tested
+  """
+  def get_local_sandwich(vm_id) do
+    statement = ["SELECT sandwich FROM sw WHERE pk = '#{vm_id}'"]
     Corrodemo.CorroCalls.query_corro(statement)
   end
 
   @doc """
-  This isn't used
+  This isn't used or tested
   """
   def get_sandwich_table() do
     statement = ["SELECT * FROM sw"]
