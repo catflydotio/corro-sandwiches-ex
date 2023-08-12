@@ -23,7 +23,7 @@ defmodule CorrodemoWeb.ShowOutputLive do
 
           <div class="grid grid-cols-2 auto-cols-min gap-2 mb-2">
             <div>
-              Local "sandwich" by PubSub:
+              <%= @this_instance %>'s local sandwich:
             </div>
             <div>
               <%= @pubsub_sandwich %>
@@ -34,6 +34,8 @@ defmodule CorrodemoWeb.ShowOutputLive do
 
             <p>It picks a new sandwich from a list every second, and sends a Phoenix PubSub message about it. </p>
             <p>This LiveView subscribes to those messages and changes the <code>&commat;pubsub_sandwich</code> assign when the local sandwich changes.</p>
+            <p>The SandwichSender module subscribes too, and sends an API call to Corrosion to update this instance's line in the <code>sw</code> table. Corrosion then shares that update to the rest of the Corrosion cluster.</p>
+            <p>Note to self: add the curl example for the sandwich upload.</p>
           </div>
           <h2 class="text-lg mb-2 font-semibold leading-10 col-span-2">From Corrosion:</h2>
           <div class="grid grid-cols-2 auto-cols-min gap-2 content-start">
