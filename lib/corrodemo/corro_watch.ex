@@ -81,7 +81,7 @@ defmodule Corrodemo.CorroWatch do
           # IO.inspect(headers, label: "headers")
           %Req.Response{response | headers: headers}
         {:data, data}, response ->
-          IO.inspect(response, label: "response")
+          # IO.inspect(response, label: "response")
           # IO.inspect(data, label: "data")
           data
           |> String.split("\n", trim: true)

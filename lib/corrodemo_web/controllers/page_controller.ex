@@ -1,9 +1,14 @@
 defmodule CorrodemoWeb.PageController do
   use CorrodemoWeb, :controller
 
-  def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout. (changed that-CAN)
-    render(conn, :home)
+  def sandwich(conn, _params) do
+    inspect(Corrodemo.GenSandwich.get_sandwich()) |> IO.puts()
+    with sandwich <- Corrodemo.GenSandwich.get_sandwich() do
+
+      render(conn, :sandwich, sandwich: sandwich)
+    else
+      _ -> render(conn, :sandwich, sandwich: "default")
+    end
   end
+
 end

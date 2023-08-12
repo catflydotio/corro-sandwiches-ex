@@ -15,22 +15,7 @@ defmodule Corrodemo.SandwichSender do
     |> IO.inspect(label: "Sandwich sender subscribed to sandwichmsg PubSub topic")
     region = Application.fetch_env!(:corrodemo, :fly_region)
     IO.inspect("About to call init region sandwich #{region}")
-    case init_region_sandwich(region) do
-      {:ok, results}
-        -> case results do
-          %{"rows_affected" => rows_affected} ->
-            cond do
-              rows_affected == 0 -> IO.puts("No rows affected; sandwich already initialised")
-              rows_affected > 0 -> IO.puts("Initialised sandwich")
-            end
-            {:ok, []}
-          end
-      {:error, reason}
-        -> IO.puts("Couldn't initialise region sandwich!")
-        inspect(reason) |> Logger.debug()
-        {:ok, "Couldn't init region sandwich"}
-      _ -> IO.puts("init_region_sandwich returned something I don't recognise")
-    end
+    init_region_sandwich(region)
     IO.inspect("About to start a watch")
     Corrodemo.CorroCalls.start_watch("select pk as region, sandwich from sw")
     {:ok, []}
@@ -38,25 +23,11 @@ defmodule Corrodemo.SandwichSender do
 
   def handle_info({:sandwich, message}, state) do
     #  IO.puts("Sandwich sender received #{message} by PubSub")
-     fly_region = Application.fetch_env!(:corrodemo, :fly_region)
-     Corrodemo.FlyDnsReq.get_all_instances()
-      #IO.inspect(fly_region)
-      #IO.inspect(message)
-     case upload_region_sandwich(fly_region, message) do
-      {:ok, results}
-        -> case results do
-          %{"rows_affected" => rows_affected} ->
-            cond do
-              rows_affected == 0 -> IO.puts("No rows affected; no sandwich uploaded")
-              rows_affected > 0 -> # IO.inspect("rows_affected: #{rows_affected}. Successfully updated sandwich in Corrosion")
-            end
-            {:ok, []}
-          end
-      {:error, reason}
-        -> IO.puts("Couldn't upload region sandwich!")
-        inspect(reason) |> Logger.debug()
-        System.stop(0)
-    end
+    fly_region = Application.fetch_env!(:corrodemo, :fly_region)
+    Corrodemo.FlyDnsReq.get_all_instances()
+    #IO.inspect(fly_region)
+    #IO.inspect(message)
+    upload_region_sandwich(fly_region, message)
     {:noreply, state}
   end
 
@@ -68,14 +39,43 @@ defmodule Corrodemo.SandwichSender do
   def init_region_sandwich(region) do
     statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{region}', 'empty')"]
     # IO.inspect(statement)
-    Corrodemo.CorroCalls.execute_corro(statement)
+    case Corrodemo.CorroCalls.execute_corro(statement) do
+    {:ok, results}
+          -> case results do
+            %{"rows_affected" => rows_affected} ->
+              cond do
+                rows_affected == 0 -> IO.puts("No rows affected; sandwich already initialised")
+                rows_affected > 0 -> IO.puts("Initialised sandwich")
+              end
+              {:ok, []}
+          end
+      {:error, reason}
+        -> IO.puts("Couldn't initialise region sandwich!")
+        inspect(reason) |> Logger.debug()
+        {:ok, "Couldn't init region sandwich"}
+      _ -> IO.puts("init_region_sandwich returned something I don't recognise")
+    end
   end
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_region_sandwich(region, sandwich) do
     statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{region}'"]
     # IO.inspect(statement)
-    Corrodemo.CorroCalls.execute_corro(statement)
+    case Corrodemo.CorroCalls.execute_corro(statement) do
+    {:ok, results}
+        -> case results do
+          %{"rows_affected" => rows_affected} ->
+            cond do
+              rows_affected == 0 -> IO.puts("No rows affected; no sandwich uploaded")
+              rows_affected > 0 -> IO.inspect("rows_affected: #{rows_affected}. Successfully updated sandwich in Corrosion")
+            end
+            {:ok, []}
+          end
+    {:error, reason}
+      -> IO.puts("Couldn't upload region sandwich!")
+      inspect(reason) |> Logger.debug()
+      System.stop(0)
+    end
   end
 
   def get_region_sandwich(region) do

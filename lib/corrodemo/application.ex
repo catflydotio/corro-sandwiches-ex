@@ -21,11 +21,11 @@ defmodule Corrodemo.Application do
       # Start the Endpoint (http/https)
       {DynamicSupervisor, name: Corrodemo.WatchSupervisor, strategy: :one_for_one},
       # Corrodemo.CorroWatch,
-      CorrodemoWeb.Endpoint,
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
       # {Corrodemo.Worker, arg}
       #Corrodemo.CorroPort,
       Corrodemo.GenSandwich,
+      CorrodemoWeb.Endpoint,
       Corrodemo.SandwichSender,
       Corrodemo.FriendFinder
       # Corrodemo.CheckCorro
