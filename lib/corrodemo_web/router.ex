@@ -19,12 +19,12 @@ defmodule CorrodemoWeb.Router do
     pipe_through :browser
     live "/", ShowOutputLive
     get "/sandwich", PageController, :sandwich
-
-    # get "/", PageController, :home
+    # get "/apii/sandwich", PageController, :show
   end
 
   scope "/api", CorrodemoWeb do
     pipe_through :api
+    get "/sandwich", APIController, :show
   end
 
   # Other scopes may use custom stacks.
