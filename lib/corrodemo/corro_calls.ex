@@ -21,8 +21,8 @@ defmodule Corrodemo.CorroCalls do
     end
   end
 
-  def execute_corro(statement) do
-    corro_request("transactions", statement)
+  def execute_corro(transactions) do
+    corro_request("transactions", transactions)
   end
 
   def query_corro(statement) do

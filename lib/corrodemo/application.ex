@@ -27,6 +27,7 @@ defmodule Corrodemo.Application do
       Corrodemo.GenSandwich,
       CorrodemoWeb.Endpoint,
       Corrodemo.SandwichSender,
+      Corrodemo.Discoverer,
       Corrodemo.FriendFinder
       # Corrodemo.CheckCorro
     ]

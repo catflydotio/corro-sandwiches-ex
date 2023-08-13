@@ -12,12 +12,15 @@ defmodule Corrodemo.Discoverer do
   end
 
   def start_checking() do
-    Process.send_after(self(), :check_service, 10000)
+    Process.send_after(self(), :check_service, 3000)
   end
 
   def handle_info(:check_service, _state) do
+    check_service()
+    |> inspect |> IO.inspect(label: "check_service")
     case check_service() do
-      %{"sandwich"=> sandwich,"status"=> statuss} -> corro_service_update(statuss, sandwich)
+      %{"sandwich": sandwich } -> corro_service_update("up", sandwich)
+      _ -> corro_service_update("down", "unknown")
     end
     start_checking()
     {:noreply, []}
@@ -27,14 +30,15 @@ defmodule Corrodemo.Discoverer do
     Corrodemo.GenSandwich.get_sandwich()
   end
 
-  def corro_service_update(statuss, sandwich) do
+  def corro_service_update(status, sandwich) do
     region = Application.fetch_env!(:corrodemo, :fly_region)
     datetime = DateTime.utc_now()
     timestamp = DateTime.to_unix(datetime)
+    IO.inspect(timestamp, label: "timestamp")
     vm_id = Application.fetch_env!(:corrodemo, :fly_vm_id)
-    statement = "INSERT OR UPDATE INTO sandwich_services (vm_id, srv_state, sandwich, timestmp) VALUES ('#{vm_id}', '#{statuss}', '#{sandwich}', '#{timestamp}')"
-    IO.inspect(statement)
-    Corrodemo.CorroCalls.execute_corro(statement)
+    transactions = ["REPLACE INTO sandwich_services (vm_id, srv_state, sandwich, timestmp) VALUES (\"#{vm_id}\", \"#{status}\", \"#{sandwich}\", \"#{timestamp}\")"]
+    IO.inspect(transactions)
+    Corrodemo.CorroCalls.execute_corro(transactions)
     # vm_id TEXT PRIMARY KEY, region TEXT, srv_state TEXT, sandwich TEXT, timestmp TEXT
   end
 end

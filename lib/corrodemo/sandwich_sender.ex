@@ -35,9 +35,9 @@ defmodule Corrodemo.SandwichSender do
   end
 
   def init_local_sandwich(vm_id) do
-    statement = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{vm_id}', 'empty')"]
+    transactions = ["INSERT OR IGNORE INTO sw (pk, sandwich) VALUES ('#{vm_id}', 'empty')"]
     # IO.inspect(statement)
-    case Corrodemo.CorroCalls.execute_corro(statement) do
+    case Corrodemo.CorroCalls.execute_corro(transactions) do
     {:ok, results}
           -> case results do
             %{"rows_affected" => rows_affected} ->
@@ -57,9 +57,9 @@ defmodule Corrodemo.SandwichSender do
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_local_sandwich(vm_id, sandwich) do
-    statement = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{vm_id}'"]
-    # IO.inspect(statement)
-    case Corrodemo.CorroCalls.execute_corro(statement) do
+    transactions = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{vm_id}'"]
+    # IO.inspect(transactions)
+    case Corrodemo.CorroCalls.execute_corro(transactions) do
     {:ok, results}
         -> case results do
           %{"rows_affected" => rows_affected} ->

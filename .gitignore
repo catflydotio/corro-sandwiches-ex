@@ -37,6 +37,8 @@ npm-debug.log
 
 # Corrosion stuff
 corrosion
+# Script to recreate app when I need to wipe it
+aio-from-scratch.sh
 
 .DS_Store
 
