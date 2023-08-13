@@ -9,8 +9,8 @@ defmodule Corrodemo.CorroCalls do
       |> Finch.request(Corrodemo.Finch) do
         case status_code do
           200 -> extract_results(body)
-          404 -> IO.inspect("got a 404")
-          422 -> IO.puts("got a 422 -- check syntax and json formatting")
+          404 -> IO.puts("got a 404")
+          422 -> IO.puts("got a 422 -- check syntax and structure of the sql statement")
           unexpected_response -> inspect(unexpected_response) |> IO.inspect(label: "got a non-200, non-404 error code")
         end
     else
@@ -32,7 +32,8 @@ defmodule Corrodemo.CorroCalls do
     # %{body: "{\"results\":[{\"rows_affected\":0,\"time\":0.00008258}],\"time\":0.000364641}", headers: [{"content-type", "application/json"}, {"content-length", "70"}, {"date", "Fri, 14 Jul 2023 22:00:35 GMT"}], status_code: 200}
     # IO.inspect(Jason.decode(body))
     with {:ok, %{"results" => [resultsmap],"time" => _time}} <- Jason.decode(body) do
-    inspect(resultsmap) |> IO.inspect(lanel: "in corrosion calls. resultsmap")
+    # inspect(resultsmap)
+    # |> IO.inspect(label: "in corrosion calls. resultsmap")
     {:ok, resultsmap}
     end
   end

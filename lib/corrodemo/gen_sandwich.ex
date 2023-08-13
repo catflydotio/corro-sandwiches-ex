@@ -8,7 +8,7 @@ defmodule Corrodemo.GenSandwich do
   end
 
   def do_the_swap(menu) do
-    Process.send_after(self(), {:do_the_swap, menu}, 1000)
+    Process.send_after(self(), {:do_the_swap, menu}, 2500)
   end
 
   def init(_opts) do
@@ -30,7 +30,7 @@ defmodule Corrodemo.GenSandwich do
   end
 
   def handle_call(:get_sandwich, _from, state) do
-    IO.puts("handle call state: "<>state)
+    # IO.puts("handle call state: "<>state)
     {:reply, %{sandwich: state},  state}
   end
 

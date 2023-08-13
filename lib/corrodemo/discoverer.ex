@@ -16,7 +16,7 @@ defmodule Corrodemo.Discoverer do
 
   def handle_info(:check_service, _state) do
     check_service()
-    |> inspect |> IO.inspect(label: "check_service")
+    # |> inspect |> IO.inspect(label: "check_service")
     case check_service() do
       %{sandwich: sandwich } -> corro_service_update("up", sandwich)
       _ -> corro_service_update("down", "unknown")
@@ -33,10 +33,10 @@ defmodule Corrodemo.Discoverer do
     region = Application.fetch_env!(:corrodemo, :fly_region)
     datetime = DateTime.utc_now()
     timestamp = DateTime.to_unix(datetime)
-    IO.inspect(timestamp, label: "timestamp")
+    # IO.inspect(timestamp, label: "timestamp")
     vm_id = Application.fetch_env!(:corrodemo, :fly_vm_id)
     transactions = ["REPLACE INTO sandwich_services (vm_id, region, srv_state, sandwich, timestmp) VALUES (\"#{vm_id}\", \"#{region}\", \"#{status}\", \"#{sandwich}\", \"#{timestamp}\")"]
-    IO.inspect(transactions)
+    IO.inspect("updated local service status to #{status}")
     Corrodemo.CorroCalls.execute_corro(transactions)
     # vm_id TEXT PRIMARY KEY, region TEXT, srv_state TEXT, sandwich TEXT, timestmp TEXT
   end

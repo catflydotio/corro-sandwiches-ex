@@ -14,8 +14,10 @@ defmodule Corrodemo.SandwichSender do
     vm = Application.fetch_env!(:corrodemo, :fly_vm_id)
     IO.inspect("About to call init local sandwich #{vm}")
     init_local_sandwich(vm)
-    IO.inspect("About to start a watch")
+    IO.inspect("About to start a watch on the sw table")
     Corrodemo.CorroCalls.start_watch("SELECT pk AS vm_id, sandwich FROM sw")
+    IO.inspect("About to start a watch on the sandwich_services table")
+    Corrodemo.CorroCalls.start_watch("SELECT vm_id, region, srv_state FROM sandwich_services")
     {:ok, []}
   end
 
@@ -63,7 +65,7 @@ defmodule Corrodemo.SandwichSender do
           %{"rows_affected" => rows_affected} ->
             cond do
               rows_affected == 0 -> IO.puts("No rows affected; no sandwich uploaded")
-              rows_affected > 0 -> IO.inspect("rows_affected: #{rows_affected}. Successfully updated sandwich in Corrosion")
+              rows_affected > 0 -> IO.inspect("Updated sandwich to #{sandwich} in Corrosion")
             end
             {:ok, []}
           end

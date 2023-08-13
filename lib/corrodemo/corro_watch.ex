@@ -46,6 +46,7 @@ defmodule Corrodemo.CorroWatch do
         -> IO.puts("end of query")
       %{"data" => %{"cells" => [head | tail], "change_type" => _change_type, "rowid" => _rowid}}
         -> Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, [head | tail]})
+        inspect([head | tail]) |> IO.inspect(label: "Watch update")
       # At this point in the possibilities, if "data" is a list, Corrosion is telling us
       # if the ids are rows or columns:
       %{"data" => [head | tail], "event" => id_kind}
