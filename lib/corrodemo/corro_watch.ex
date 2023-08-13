@@ -110,9 +110,6 @@ defmodule Corrodemo.CorroWatch do
 
   end
 
-  @doc """
-  Returns the full configured URL given the API path.
-  """
   defp url(path) do
     base = Application.fetch_env!(:corrodemo, :corro_baseurl)
     IO.inspect(Path.join(base, path), label: "corrosion watch url")

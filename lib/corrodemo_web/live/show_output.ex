@@ -1,8 +1,6 @@
 defmodule CorrodemoWeb.ShowOutputLive do
   # In Phoenix v1.6+ apps, the line is typically: use MyAppWeb, :live_view
   use Phoenix.LiveView
-  import Corrodemo.CorroCalls
-  import Corrodemo.FriendFinder
 
   def render(assigns) do
     ~H"""

@@ -31,7 +31,7 @@ defmodule Corrodemo.GenSandwich do
 
   def handle_call(:get_sandwich, _from, state) do
     IO.puts("handle call state: "<>state)
-    {:reply, %{"sandwich": state},  state}
+    {:reply, %{sandwich: state},  state}
   end
 
   def get_sandwich() do

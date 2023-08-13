@@ -1,7 +1,5 @@
 defmodule Corrodemo.SandwichSender do
   use GenServer
-  import Corrodemo.CorroCalls
-  import Corrodemo.FlyDnsReq
   require Logger
 
   def start_link(_opts \\ []) do
@@ -81,7 +79,7 @@ defmodule Corrodemo.SandwichSender do
   This isn't used or tested
   """
   def get_local_sandwich(vm_id) do
-    statement = ["SELECT sandwich FROM sw WHERE pk = '#{vm_id}'"]
+    statement = "SELECT sandwich FROM sw WHERE pk = '#{vm_id}'"
     Corrodemo.CorroCalls.query_corro(statement)
   end
 
@@ -89,7 +87,7 @@ defmodule Corrodemo.SandwichSender do
   This isn't used or tested
   """
   def get_sandwich_table() do
-    statement = ["SELECT * FROM sw"]
+    statement = "SELECT * FROM sw"
     Corrodemo.CorroCalls.corro_request("query", statement)
     |> IO.inspect()
   end

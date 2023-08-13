@@ -1,12 +1,11 @@
 defmodule Corrodemo.CorroCalls do
-  import Corrodemo.FlyDnsReq
   require Logger
 
   # e.g. Corrodemo.CorroCalls.corro_request("query","SELECT foo FROM TESTS")
   def corro_request(path, statement) do
     Corrodemo.FlyDnsReq.get_corro_instance()
     corro_db_url = "#{Application.fetch_env!(:corrodemo, :corro_baseurl)}/v1/"
-    with {:ok, %Finch.Response{status: status_code, body: body, headers: headers}} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
+    with {:ok, %Finch.Response{status: status_code, body: body, headers: _headers}} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
       |> Finch.request(Corrodemo.Finch) do
         case status_code do
           200 -> extract_results(body)
@@ -32,7 +31,7 @@ defmodule Corrodemo.CorroCalls do
   defp extract_results(body) do
     # %{body: "{\"results\":[{\"rows_affected\":0,\"time\":0.00008258}],\"time\":0.000364641}", headers: [{"content-type", "application/json"}, {"content-length", "70"}, {"date", "Fri, 14 Jul 2023 22:00:35 GMT"}], status_code: 200}
     # IO.inspect(Jason.decode(body))
-    with {:ok, %{"results" => [resultsmap],"time" => time}} <- Jason.decode(body) do
+    with {:ok, %{"results" => [resultsmap],"time" => _time}} <- Jason.decode(body) do
     inspect(resultsmap) |> IO.inspect(lanel: "in corrosion calls. resultsmap")
     {:ok, resultsmap}
     end

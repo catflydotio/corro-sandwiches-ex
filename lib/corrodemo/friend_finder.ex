@@ -1,8 +1,6 @@
 defmodule Corrodemo.FriendFinder do
   use GenServer
   require Logger
-  import Corrodemo.FlyDnsReq
-
 
   def start_link(_opts \\ []) do
     GenServer.start_link(Corrodemo.FriendFinder, [])

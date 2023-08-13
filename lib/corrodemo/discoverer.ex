@@ -1,6 +1,5 @@
 defmodule Corrodemo.Discoverer do
   use GenServer
-  import Corrodemo.CorroCalls
 
   def start_link(_opts \\ []) do
     GenServer.start_link(__MODULE__, [])
@@ -19,7 +18,7 @@ defmodule Corrodemo.Discoverer do
     check_service()
     |> inspect |> IO.inspect(label: "check_service")
     case check_service() do
-      %{"sandwich": sandwich } -> corro_service_update("up", sandwich)
+      %{sandwich: sandwich } -> corro_service_update("up", sandwich)
       _ -> corro_service_update("down", "unknown")
     end
     start_checking()
@@ -36,7 +35,7 @@ defmodule Corrodemo.Discoverer do
     timestamp = DateTime.to_unix(datetime)
     IO.inspect(timestamp, label: "timestamp")
     vm_id = Application.fetch_env!(:corrodemo, :fly_vm_id)
-    transactions = ["REPLACE INTO sandwich_services (vm_id, srv_state, sandwich, timestmp) VALUES (\"#{vm_id}\", \"#{status}\", \"#{sandwich}\", \"#{timestamp}\")"]
+    transactions = ["REPLACE INTO sandwich_services (vm_id, region, srv_state, sandwich, timestmp) VALUES (\"#{vm_id}\", \"#{region}\", \"#{status}\", \"#{sandwich}\", \"#{timestamp}\")"]
     IO.inspect(transactions)
     Corrodemo.CorroCalls.execute_corro(transactions)
     # vm_id TEXT PRIMARY KEY, region TEXT, srv_state TEXT, sandwich TEXT, timestmp TEXT
