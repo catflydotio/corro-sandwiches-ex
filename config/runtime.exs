@@ -39,7 +39,8 @@ end
 
 config :corrodemo,
   corro_builtin: System.get_env("CORRO_BUILTIN"),
-  fly_region: System.get_env("FLY_MACHINE_ID"),
+  fly_region: System.get_env("FLY_REGION"),
+  fly_vm_id: System.get_env("FLY_MACHINE_ID"),
   fly_app_name: System.get_env("FLY_APP_NAME")
 
 if config_env() == :prod do
