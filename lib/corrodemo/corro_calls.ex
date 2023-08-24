@@ -5,14 +5,9 @@ defmodule Corrodemo.CorroCalls do
   def corro_request(path, statement) do
     Corrodemo.FlyDnsReq.get_corro_instance()
     corro_db_url = "#{Application.fetch_env!(:corrodemo, :corro_baseurl)}/v1/"
-    with {:ok, %Finch.Response{status: status_code, body: body, headers: _headers}} <- Finch.build(:post,"#{corro_db_url}#{path}",[{"content-type", "application/json"}],Jason.encode!(statement))
+    with {:ok, %Finch.Response{status: status_code, body: body, headers: headers}} <- Finch.build(:post, "#{corro_db_url}#{path}",[{"content-type", "application/json"}], Jason.encode!(statement))
       |> Finch.request(Corrodemo.Finch) do
-        case status_code do
-          200 -> extract_results(body)
-          404 -> IO.puts("got a 404")
-          422 -> IO.puts("got a 422 -- check syntax and structure of the sql statement")
-          unexpected_response -> inspect(unexpected_response) |> IO.inspect(label: "got a non-200, non-404 error code")
-        end
+        extract_results(%{status: status_code, body: body, headers: headers})
     else
       {:ok, response} -> IO.inspect(response, label: "Got an unexpected response in query_corro")
       {:error, resp} -> {:error, resp}
@@ -28,14 +23,38 @@ defmodule Corrodemo.CorroCalls do
     corro_request("queries", statement)
   end
 
-  defp extract_results(body) do
+  @doc """
+  This function gets a map from corro_request/2 with status
+  """
+  defp extract_results(response=%{status: status_code, body: body, headers: headers}) do
     # %{body: "{\"results\":[{\"rows_affected\":0,\"time\":0.00008258}],\"time\":0.000364641}", headers: [{"content-type", "application/json"}, {"content-length", "70"}, {"date", "Fri, 14 Jul 2023 22:00:35 GMT"}], status_code: 200}
     # IO.inspect(Jason.decode(body))
-    with {:ok, %{"results" => [resultsmap],"time" => _time}} <- Jason.decode(body) do
+
+    IO.puts("So far we have a response map")
+
+    bodylist = body |> String.split("\n", trim: true)
+    |> IO.inspect(label: "!!88888 OOOOO !!!")
+    |> Enum.map(fn x -> Jason.decode!(x, []) end)
+    IO.inspect(bodylist, label: "NWO LOOOK")
+      # Sometimes the body is a single JSON thing you can decode.
+      # Sometimes it's more than one, separated by \n.
+    #   # The most general thing to return would be that list.
+    #   |> IO.inspect(label: "body")
+    #   |> String.split("\n", trim: true)
+    #   #
+    #   # |> IO.inspect(label: "split string")
+    #   |> Enum.each(fn str ->
+    #     Jason.decode!(str)
+    #     |> IO.inspect(label: "a decoded str")
+    #     end)
+
+
+
+    # with {:ok, %{"results" => [resultsmap],"time" => _time}} <- Jason.decode(body) do
     # inspect(resultsmap)
-    # |> IO.inspect(label: "in corrosion calls. resultsmap")
-    {:ok, resultsmap}
-    end
+    # |> IO.inspect(label: "*** in corrosion calls. resultsmap")
+    # {:ok, resultsmap}
+    # end
   end
 
   def start_watch(statement) do

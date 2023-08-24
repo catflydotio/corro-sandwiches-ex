@@ -24,7 +24,6 @@ defmodule Corrodemo.GenSandwich do
   def handle_info({:do_the_swap, menu}, _state) do
     sandwich = Enum.random(menu)
     Phoenix.PubSub.broadcast(Corrodemo.PubSub, "sandwichmsg", {:sandwich, sandwich})
-    # get_sandwich()
     do_the_swap(menu)
     {:noreply, sandwich}
   end

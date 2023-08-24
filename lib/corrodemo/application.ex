@@ -20,6 +20,7 @@ defmodule Corrodemo.Application do
         }},
       # Start the Endpoint (http/https)
       {DynamicSupervisor, name: Corrodemo.WatchSupervisor, strategy: :one_for_one},
+      {Task.Supervisor, name: Corrodemo.TaskSupervisor},
       # Start a worker by calling: Corrodemo.Worker.start_link(arg)
       # {Corrodemo.Worker, arg}
       #Corrodemo.CorroPort,

@@ -95,7 +95,7 @@ curl -v http://top1.nearest.of.ccorrosion.internal:8080/v1/watches \
   end
 
   def mount(_params, _session, socket) do
-    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "fromcorro")
+    Phoenix.PubSub.subscribe(Corrodemo.PubSub, "from_corro")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "sandwichmsg")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "friend_regions")
     Phoenix.PubSub.subscribe(Corrodemo.PubSub, "corro_regions")
@@ -137,12 +137,17 @@ curl -v http://top1.nearest.of.ccorrosion.internal:8080/v1/watches \
     {:noreply, assign(socket, pubsub_sandwich: sandwich)}
   end
 
-  def handle_info({:fromcorro, [vm_id, sandwich]}, socket) do
+  def handle_info({"watchwich", [vm_id, sandwich]}, socket) do
     # IO.puts "LiveView getting a sandwich from corrosion: #{vm_id}, #{sandwich}"
     updated_kvs = Map.put(socket.assigns.kvs, vm_id, sandwich)
     # thing = Code.eval_string(updated_kvs) # |> elem(0)
     # IO.inspect(updated_kvs)
     {:noreply, assign(socket, :kvs, updated_kvs)}
+  end
+
+  def handle_info({"services", [head | tail]}, socket) do
+    IO.puts "LiveView getting a services update from corrosion."
+    {:noreply, socket}
   end
 
   def handle_info({:other_regions, other_regions}, socket) do

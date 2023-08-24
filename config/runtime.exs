@@ -41,7 +41,8 @@ config :corrodemo,
   corro_builtin: System.get_env("CORRO_BUILTIN"),
   fly_region: System.get_env("FLY_REGION"),
   fly_vm_id: System.get_env("FLY_MACHINE_ID"),
-  fly_app_name: System.get_env("FLY_APP_NAME")
+  fly_app_name: System.get_env("FLY_APP_NAME"),
+  fly_private_ip: System.get_env("FLY_PRIVATE_IP")
 
 if config_env() == :prod do
   IO.puts("Configuring prod env")

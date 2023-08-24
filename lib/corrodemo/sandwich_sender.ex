@@ -15,9 +15,9 @@ defmodule Corrodemo.SandwichSender do
     IO.inspect("About to call init local sandwich #{vm}")
     init_local_sandwich(vm)
     IO.inspect("About to start a watch on the sw table")
-    Corrodemo.CorroCalls.start_watch("SELECT pk AS vm_id, sandwich FROM sw")
+    Corrodemo.CorroCalls.start_watch({"watchwich", "SELECT pk AS vm_id, sandwich FROM sw"})
     IO.inspect("About to start a watch on the sandwich_services table")
-    Corrodemo.CorroCalls.start_watch("SELECT vm_id, region, srv_state FROM sandwich_services")
+    Corrodemo.CorroCalls.start_watch({"services", "SELECT vm_id, region, srv_state FROM sandwich_services"})
     {:ok, []}
   end
 
@@ -57,7 +57,8 @@ defmodule Corrodemo.SandwichSender do
 
   # "UPDATE tests SET foo = \"boffo\" WHERE id = 1021"
   def upload_local_sandwich(vm_id, sandwich) do
-    transactions = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pk = '#{vm_id}'"]
+    IO.puts("I AM UPLOADING A LOCAL SANDWICH WRONG")
+    transactions = ["UPDATE sw SET sandwich = '#{sandwich}' WHERE pok = '#{vm_id}'"]
     # IO.inspect(transactions)
     case Corrodemo.CorroCalls.execute_corro(transactions) do
     {:ok, results}

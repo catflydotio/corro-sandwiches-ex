@@ -10,43 +10,46 @@ defmodule Corrodemo.CorroWatch do
   use GenServer
   require Logger
 
-  def start_link(statement) do
+  def start_link({name, statement}) do
     # This is the function that gets run by the supervisor when I run the server
-    GenServer.start_link(Corrodemo.CorroWatch, statement)
+    GenServer.start_link(Corrodemo.CorroWatch, {name, statement})
   end
 
-  def init(statement) do
-    Process.send(self(), {:start_watcher, statement}, [])
-    {:ok, statement}
+  def init({name, statement}) do
+    Process.send(self(), {:start_watcher, name, statement}, [])
+    {:ok, {name, statement}}
   end
 
-  def handle_info({:start_watcher, statement}, _opts) do
-    do_watch(statement) #"SELECT sandwich FROM sw WHERE pk='mad'"
+  def handle_info({:start_watcher, name, statement}, _opts) do
+    do_watch(name, statement) #"SELECT sandwich FROM sw WHERE pk='mad'"
     IO.puts("Started watch")
-    {:noreply, statement}
+    {:noreply, {name, statement}}
   end
 
-  def do_watch(sql) do
+  def do_watch(watch_name, sql) do
     IO.inspect(sql, label: "In do_watch. sql is")
     path = "/v1/watches"
     json_sql = Jason.encode!(sql)
     stream(path, json_sql, %{}, fn
       resp_data, :resp_data, acc ->
         # do something with response data and return the accumulator:
-        watch_actions(resp_data)
+        watch_actions(watch_name, resp_data)
         acc
     end)
     {:ok, []}
   end
 
-  def watch_actions(resp_data) do
+  def watch_actions(watch_name, resp_data) do
+    # IO.inspect(resp_data, label: "resp_data in watch_actions")
+    # IO.inspect(watch_name, label: "watch_name in watch_actions")
+
     resp_data
     |> case do
       %{"event" => "end_of_query"}
         -> IO.puts("end of query")
       %{"data" => %{"cells" => [head | tail], "change_type" => _change_type, "rowid" => _rowid}}
-        -> Phoenix.PubSub.broadcast(Corrodemo.PubSub, "fromcorro", {:fromcorro, [head | tail]})
-        inspect([head | tail]) |> IO.inspect(label: "Watch update")
+        -> Phoenix.PubSub.broadcast(Corrodemo.PubSub, "from_corro", {watch_name, [head | tail]})
+        inspect([head | tail]) |> IO.inspect(label: "Update from #{watch_name} Corrosion watch")
       # At this point in the possibilities, if "data" is a list, Corrosion is telling us
       # if the ids are rows or columns:
       %{"data" => [head | tail], "event" => id_kind}
@@ -84,14 +87,20 @@ defmodule Corrodemo.CorroWatch do
         {:data, data}, response ->
           # IO.inspect(response, label: "response")
           # IO.inspect(data, label: "data")
-          data
-          |> String.split("\n", trim: true)
-          # |> IO.inspect(label: "split string")
-          |> Enum.each(fn str ->
-            Jason.decode!(str)
-            # |> IO.inspect(label: "stuff")
-            |> caller_acc.(:resp_data, acc)
-          end)
+          # IO.inspect(response)
+          with {"corro-query-id", watch_id} <- Enum.find(response.headers, fn {_a, _} -> _a = "corro-query-id" end) do
+            with %{"data" => %{}, "event" => _col_or_row} <- data do
+              IO.inspect("ha, success!")
+            end
+            data
+            |> String.split("\n", trim: true)
+            # |> IO.inspect(label: "split string")
+            |> Enum.each(fn str ->
+              Jason.decode!(str)
+              |> Map.put("watch_id", watch_id)
+              |> caller_acc.(:resp_data, acc)
+            end)
+          end
           response
       end
 
@@ -110,6 +119,8 @@ defmodule Corrodemo.CorroWatch do
     post_stream_req(path, finch_fun, json_sql)
 
   end
+
+
 
   defp url(path) do
     base = Application.fetch_env!(:corrodemo, :corro_baseurl)
