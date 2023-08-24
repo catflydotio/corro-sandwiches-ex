@@ -42,43 +42,20 @@ defmodule Corrodemo.CorroWatch do
   def watch_actions(watch_name, resp_data) do
     # IO.inspect(resp_data, label: "resp_data in watch_actions")
     # IO.inspect(watch_name, label: "watch_name in watch_actions")
-      with %{"watch_id" => watch_id} <- resp_data do
-        case resp_data do
-          %{"eoq" => _time} -> IO.puts("end of query")
-          %{"columns" => [head | tail]} -> IO.puts("got some column names: #{[head | tail]}")
-          %{"row" => [head | tail]} -> IO.puts("got some values for a row")
-            Phoenix.PubSub.broadcast(Corrodemo.PubSub, "from_corro", {watch_name, [head | tail]})
-          %{"change" => [change_kind, row_id, [head | tail]]} -> IO.puts("got a changed row")
-            Phoenix.PubSub.broadcast(Corrodemo.PubSub, "from_corro", {watch_name, [head | tail]})
-          something_else -> IO.inspect(something_else, label: "got something I didn't plan for in streaming response")
-        end
-
-      else
-       _ -> IO.puts("No watch_id found; that's unexpected")
+    with %{"watch_id" => watch_id} <- resp_data do
+      case resp_data do
+        %{"eoq" => _time} -> IO.puts("end of query")
+        %{"columns" => [head | tail]} -> IO.puts("got some column names: #{[head | tail]}")
+        %{"row" => [head | tail]} -> IO.puts("got some values for a row")
+          Phoenix.PubSub.broadcast(Corrodemo.PubSub, "from_corro", {watch_name, [head | tail]})
+        %{"change" => [change_kind, row_id, [head | tail]]} -> IO.puts("got a changed row")
+          Phoenix.PubSub.broadcast(Corrodemo.PubSub, "from_corro", {watch_name, [head | tail]})
+        something_else -> IO.inspect(something_else, label: "got something I didn't plan for in streaming response")
       end
 
-    # with %{_somekey => vlue, "watch_id" => _watch_id} <- resp_data do
-    #   IO.puts("LALALALALALALALALAL")
-    #   resp_data
-    #   |> IO.inspect()
-    #   |> case do
-    #     %{"eoq" => _time}
-    #       -> IO.puts("end of query")
-
-    #     %{"columns" => column_names = []}
-    #       -> IO.puts(column_names)
-
-
-
-
-    #     %{"data" => %{"cells" => [head | tail], "change_type" => _change_type, "rowid" => _rowid}}
-    #       -> Phoenix.PubSub.broadcast(Corrodemo.PubSub, "from_corro", {watch_name, [head | tail]})
-    #       inspect([head | tail]) |> IO.inspect(label: "Update from #{watch_name} Corrosion watch")
-    #     # At this point in the possibilities, if "data" is a list, Corrosion is telling us
-    #     # if the ids are rows or columns:
-    #     %{"data" => [head | tail], "event" => id_kind}
-    #       -> IO.inspect("Watching changes in #{id_kind}: #{[head | tail]}") # could write this list nicely
-
+    else
+      _ -> IO.puts("No watch_id found; that's unexpected")
+    end
   end
 
   @doc """
@@ -111,9 +88,6 @@ defmodule Corrodemo.CorroWatch do
           # IO.inspect(data, label: "data")
           # IO.inspect(response)
           with {"corro-query-id", watch_id} <- Enum.find(response.headers, fn {_a, _} -> _a = "corro-query-id" end) do
-            with %{"data" => %{}, "event" => _col_or_row} <- data do
-              IO.inspect("ha, success!")
-            end
             data
             |> String.split("\n", trim: true)
             # |> IO.inspect(label: "split string")
@@ -122,6 +96,8 @@ defmodule Corrodemo.CorroWatch do
               |> Map.put("watch_id", watch_id)
               |> caller_acc.(:resp_data, acc)
             end)
+          else
+            _ -> IO.puts("didn't get a corro-query-id in streaming response header")
           end
           response
       end
